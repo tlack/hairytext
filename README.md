@@ -33,6 +33,15 @@ without a GPU.
 * Image tagging (including objects inside images)
 * Assist in generating low-confidence predictions to more quickly improve model
 * Each project should have its own DETS files
+* API to label, view predictions log
+
+# Bugs
+
+* Many Elixir warnings
+* When creating a new example from the Predictions or Test screen, clicking on
+the example text to label it will cause it to reset. This is really annoying.
+Use a two-step editing process for now.
+* Projects broken
 
 # Notes
 
@@ -48,10 +57,10 @@ I wanted [Prodigy](https://prodi.gy/) but can't afford such bourgeoisie things.
 
 # Requirements
 
-Elixir 1.10+
-Phoenix 1.5 + LiveView 
-Python 3.6+
-Spacy NLP toolkit for Python
+* Elixir 1.10+
+* Phoenix 1.5 + LiveView 
+* Python 3.6+
+* Spacy NLP toolkit for Python
 
 # Installation
 
@@ -59,9 +68,7 @@ Spacy NLP toolkit for Python
 	$ git clone https://github.com/tlack/
 ```
 
-Install Spacy for Python. You'll need a recent version of Python. Consider using virtualenv with Hairytext. 
-
-FYI, The Python code is in priv/python
+Install Spacy for Python. You'll need a recent version of Python. Consider using virtualenv with Hairytext. FYI, The Python code is in priv/python
 
 ```
 	$ pip install spacy
