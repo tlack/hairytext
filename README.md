@@ -11,11 +11,15 @@ without a GPU.
 
 # Screenshot
 
-![HairyText app screenshot](https://i.imgur.com/2dvaxjx.png)
+![HairyText Examples screenshot](https://i.imgur.com/2dvaxjx.png)
+
+![HairyText Labeler screenshot](https://i.imgur.com/tWDeB6H.png)
+
+![HairyText TEST screenshot](https://i.imgur.com/uXdzYx9.png)
 
 # Features
 
-* Easily label for machine learning / NLP experiments
+* Easily label text fragments for machine learning / NLP experiments
 * Interactive "test" console lets you quickly debug your model
 * Refreshless but highly dynamic Phoenix Liveview web-based user interface (like React, without it)
 * User logins with HTTP AUTH password check
@@ -64,29 +68,31 @@ I wanted [Prodigy](https://prodi.gy/) but can't afford such bourgeoisie things.
 
 # Installation
 
+First, grab the code:
+
 ```
-	$ git clone https://github.com/tlack/
+	$ git clone https://github.com/tlack/hairytext/
 ```
 
-Install Spacy for Python. You'll need a recent version of Python. Consider using virtualenv with Hairytext. FYI, The Python code is in priv/python
+Then, install Spacy for Python. You'll need a recent version of Python. Consider using virtualenv with Hairytext. FYI, The Python code is in priv/python
 
 ```
 	$ pip install spacy
 ```
 
-Configure username/password:
+Next, configure the default username/password:
 ```
 	$ vim config/config.exs
 ```
 
-Install Elixir dependencies and start server:
+Finally, install Elixir dependencies and start server:
 
 ```
 	$ mix deps.get
 	$ iex -S mix phx.server
 ```
 
-Then open http://localhost:4141 to start playing. The default username and password are `admin` : `sohairy`
+Then open http://localhost:4141 to start playing. The default username and password is `admin`:`sohairy`
 
 # API
 
