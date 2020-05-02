@@ -14,7 +14,8 @@
   <div>
     <p><%= project.name %></p>
     <div class="details">
-      <%= live_redirect "Show", to: Routes.example_index_path(@socket, :project, project), class: "button" %></span>
+      <%= live_redirect "Label", to: Routes.example_index_path(@socket, :project, project), class: "button" %></span>
+      <%= live_redirect "Export", to: Routes.api_path(@socket, :export_project, project), class: "button" %></span>
       <%= live_patch "Edit", to: Routes.project_index_path(@socket, :edit, project), class: "button" %></span>
     </div>
   </div>

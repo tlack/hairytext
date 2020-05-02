@@ -28,4 +28,5 @@
   "telemetry": {:hex, :telemetry, "0.4.1", "ae2718484892448a24470e6aa341bc847c3277bfb8d4e9289f7474d752c09c7f", [:rebar3], [], "hexpm"},
   "telemetry_metrics": {:hex, :telemetry_metrics, "0.4.2", "1de986fad9aa6bf81f8a33ddfd16e5d8ab0dec6272e624eb517c1a92a44d41a9", [:mix], [{:telemetry, "~> 0.4", [hex: :telemetry, repo: "hexpm", optional: false]}], "hexpm"},
   "telemetry_poller": {:hex, :telemetry_poller, "0.5.0", "4770888ef85599ead39c7f51d6b4b62306e602d96c69b2625d54dea3d9a5204b", [:rebar3], [{:telemetry, "~> 0.4", [hex: :telemetry, repo: "hexpm", optional: false]}], "hexpm"},
+  "zstream": {:hex, :zstream, "0.5.1", "82f45d72cfb0afe020d7af0866775f79f4a90a78a8340f5b3427a4d07e8e8bf0", [:mix], [], "hexpm"},
 }

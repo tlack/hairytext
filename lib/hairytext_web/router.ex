@@ -20,6 +20,7 @@ defmodule HTWeb.Router do
     pipe_through :browser
 
     live "/", ProjectLive.Index, :index
+
     live "/projects", ProjectLive.Index, :index
     live "/projects/new", ProjectLive.Index, :new
     live "/projects/:id/edit", ProjectLive.Index, :edit
@@ -46,6 +47,7 @@ defmodule HTWeb.Router do
 
   scope "/api", HTWeb do
      pipe_through :api
+     get "/export/:id", APIController, :export_project
      get "/predict", APIController, :predict
   end
 
