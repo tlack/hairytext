@@ -8,6 +8,19 @@ defmodule Util do
     Enum.at(k, mi)
   end
 
+  def except(struc, keys) when is_struct(struc) and is_list(keys) do
+    :nyi
+  end
+  def except(map, keys) when is_map(map) and is_list(keys) do
+    :nyi
+  end
+  def except(list, elems) when is_list(list) and is_list(elems) do
+    Enum.filter(list, fn x -> !has(elems, x) end)
+  end
+  def except(list, elem) when is_list(list) and not is_list(elem) do
+    Enum.filter(list, fn x -> x != elem end)
+  end
+
   def fmt_pct(flt) when is_float(flt), do: ((round(flt * 10000) / 100) |> to_string()) <> "%"
 
   def has(map, key) when is_map(map), do: Map.has_key?(map, key)
