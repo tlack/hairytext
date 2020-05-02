@@ -14,6 +14,6 @@ defmodule HT.Data.Project do
   def changeset(project, attrs) do
     project
     |> cast(attrs, [:name, :labels, :entities])
-    |> validate_required([:name, :labels, :entities])
+    |> validate_required([:name])
   end
 end
