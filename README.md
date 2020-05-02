@@ -4,15 +4,15 @@ Hairy Text is a tool for natural language processing.
 
 With Hairy Text, you can perform named entity recognition (NER) tasks using the
 world-class [Spacy](https://spacy.io) library, and label data for training to
-improve your model. All this from a nice looking and responsive web application.
+improve your model. All this from a normal looking and mobile-friendly web
+application.
 
-It is written in Elixir + Phoenix LiveView and Python, doesn't require a database, and runs fine
-without a GPU.
+It is written in Elixir + Phoenix LiveView and Python, doesn't require a
+database, and runs fine on a $5/mo server without a GPU.
 
 # Screenshot
 
 ## List of examples for labeling
-
 ![HairyText Examples screenshot](https://i.imgur.com/2dvaxjx.png)
 
 ## Labeling interface in modal window
@@ -23,6 +23,7 @@ without a GPU.
 
 # Features
 
+* **Built with the awesome Spacy NLP framework** (so I probably didn't mess it up!)
 * Easily label text fragments for machine learning / NLP experiments
 * Interactive "test" console lets you quickly debug your model
 * Refreshless but highly dynamic Phoenix Liveview web-based user interface (like React, without it)
@@ -42,6 +43,7 @@ without a GPU.
 * Assist in generating low-confidence predictions to more quickly improve model
 * Each project should have its own DETS files
 * API to label, view predictions log
+* Learn from embeddings (BERT, I'm looking at you)
 
 # Bugs
 
@@ -49,7 +51,7 @@ without a GPU.
 * When creating a new example from the Predictions or Test screen, clicking on
 the example text to label it will cause it to reset. This is really annoying.
 Use a two-step editing process for now.
-* Projects broken
+* Projects support broken
 
 # Notes
 
