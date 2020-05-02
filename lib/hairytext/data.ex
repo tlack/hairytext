@@ -52,7 +52,7 @@ defmodule HT.Data do
   end
   def list_projects_or_create_one do
     p = list_projects()
-    if p == 0 do
+    if length(p) == 0 do
       IO.inspect(:creating_new_projects_db)
       create_project(%{"name" => "Hairy Starter Project"})
       p2 = list_projects()
