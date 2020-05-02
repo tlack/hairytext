@@ -11,10 +11,14 @@ without a GPU.
 
 # Screenshot
 
+## List of examples for labeling
+
 ![HairyText Examples screenshot](https://i.imgur.com/2dvaxjx.png)
 
+## Labeling interface in modal window
 ![HairyText Labeler screenshot](https://i.imgur.com/tWDeB6H.png)
 
+## Testing unseen input (and adding to labeling queue)
 ![HairyText TEST screenshot](https://i.imgur.com/uXdzYx9.png)
 
 # Features
