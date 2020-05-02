@@ -19,6 +19,9 @@ defmodule Util do
     end
   end
 
+  def key(map) when is_map(map), do: Map.keys(map)
+  def key(list) when is_list(list), do: Range.new(0, length(list))
+
   def map(keys, vals) when is_list(keys) and is_list(vals) do
     # Enum.zip(keys,vals) doesnt create a map when the keys are strings
     # but does when they are atoms
