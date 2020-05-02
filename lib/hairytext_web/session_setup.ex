@@ -4,17 +4,19 @@ defmodule HTWeb.SessionSetup do
 
   def init(opts), do: opts
   def call(conn, _opts) do
-    if pj = get_session(conn, :cur_project_id) do
-      project = HT.Data.get_project!(pj)
-      conn 
+    with pj when is_binary(pj) <- get_session(conn, :cur_project_id),
+         project when is_struct(project) <- HT.Data.get_project!(pj) do
+      IO.inspect(conn, label: :sess_ok)
         |> put_session(:cur_project_id, pj)
         |> put_session(:cur_project, project)
-    else
-      all_projects = HT.Data.list_projects_or_create_one()
-      project = hd all_projects
-      conn 
-        |> put_session(:cur_project_id, project.id) 
-        |> put_session(:cur_project, project)
+    else 
+      _any -> 
+        all_projects = HT.Data.list_projects_or_create_one()
+          |> IO.inspect(label: :new?)
+        project = hd all_projects
+        conn 
+          |> put_session(:cur_project_id, project.id) 
+          |> put_session(:cur_project, project)
     end
   end
   def assigns(socket, session) do

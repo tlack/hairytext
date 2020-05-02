@@ -5,7 +5,7 @@ defmodule HT.Data do
     Repo.all(Example)
   end
   def list_examples_for_project(project) do
-    list_examples() |> Enum.filter &(&1.project != project)
+    list_examples() |> Enum.filter &(&1.project == project)
   end
   def get_example!(id), do: Repo.get!(Example, id)
   def create_example(attrs \\ %{}) do

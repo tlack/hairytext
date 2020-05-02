@@ -5,8 +5,9 @@ defmodule HTWeb.ProjectLive.Index do
   alias HT.Data.Project
 
   @impl true
-  def mount(_params, _session, socket) do
-    {:ok, assign(socket, :projects, fetch_projects())}
+  def mount(_params, session, socket) do
+    s2 = socket |> HTWeb.SessionSetup.assigns(session)
+    {:ok, assign(s2, :projects, fetch_projects())}
   end
 
   @impl true

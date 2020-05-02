@@ -59,7 +59,9 @@ defmodule HTWeb.ExampleLive.Index do
 
   defp apply_action(socket, :project, %{"project" => pid}) do
     proj = Data.get_project!(pid)
+      |> IO.inspect(label: :proj)
     ex2 = Data.list_examples_for_project(pid)
+      |> IO.inspect(label: :ex2)
     socket
     |> assign(:results, ex2)
     |> assign(:project, proj.id)
@@ -118,7 +120,11 @@ defmodule HTWeb.ExampleLive.Index do
     examples = fetch_examples()
     labels = Util.pluck(examples, :label)
     entities = Util.pluck(examples, :entities) |> Enum.flat_map &Map.values/1 
-    socket |> assign(:all_labels, labels) |> assign(:all_entities, entities) |> assign(:results, []) |> assign(:example, nil)
+    socket 
+      |> assign(:all_labels, labels) 
+      |> assign(:all_entities, entities) 
+      |> assign_new(:results, fn -> [] end) 
+      |> assign_new(:example, fn -> nil end)
   end
 
 	defp search(query) do
