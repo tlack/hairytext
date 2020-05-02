@@ -59,9 +59,7 @@ defmodule HTWeb.ExampleLive.Index do
 
   defp apply_action(socket, :project, %{"project" => pid}) do
     proj = Data.get_project!(pid)
-      |> IO.inspect(label: :proj)
     ex2 = Data.list_examples_for_project(pid)
-      |> IO.inspect(label: :ex2)
     socket
     |> assign(:results, ex2)
     |> assign(:project, proj.id)
