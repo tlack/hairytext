@@ -50,6 +50,18 @@ defmodule HT.Data do
   def list_projects do
     Repo.all(Project)
   end
+  def list_projects_or_create_one do
+    p = list_projects()
+    if p == 0 do
+      IO.inspect(:creating_new_projects_db)
+      create_project(%{"name" => "Hairy Starter Project"})
+      p2 = list_projects()
+      1 = length(p2) 
+      p2
+    else
+      p
+    end
+  end
   def get_project!(id), do: Repo.get!(Project, id)
   def create_project(attrs \\ %{}) do
     %Project{}

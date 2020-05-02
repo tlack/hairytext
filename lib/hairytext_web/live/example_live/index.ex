@@ -9,6 +9,7 @@ defmodule HTWeb.ExampleLive.Index do
 		IO.inspect({params, session}, label: ExampleLive_mount)
     {:ok, 
 			socket 
+      |> HTWeb.SessionSetup.assigns(session)
 			|> assign(:query, "")
 		}
   end

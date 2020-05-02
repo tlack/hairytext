@@ -9,6 +9,7 @@ defmodule HTWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug BasicAuth, callback: &HTWeb.Auth.authorize_user/3
+    plug HTWeb.SessionSetup
   end
 
   pipeline :api do
