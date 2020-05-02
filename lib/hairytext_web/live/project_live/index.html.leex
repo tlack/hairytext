@@ -1,0 +1,24 @@
+<h1>Listing Projects</h1>
+
+<%= if @live_action in [:new, :edit] do %>
+  <%= live_modal @socket, HTWeb.ProjectLive.FormComponent,
+    id: @project.id || :new,
+    title: @page_title,
+    action: @live_action,
+    project: @project,
+    return_to: Routes.project_index_path(@socket, :index) %>
+<% end %>
+
+<div class="projects-list">
+  <%= for project <- @projects do %>
+  <div>
+    <p><%= project.name %></p>
+    <div class="details">
+      <%= live_redirect "Show", to: Routes.example_index_path(@socket, :project, project), class: "button" %></span>
+      <%= live_patch "Edit", to: Routes.project_index_path(@socket, :edit, project), class: "button" %></span>
+    </div>
+  </div>
+  <% end %>
+</div>
+
+<span><%= live_patch "New Project", to: Routes.project_index_path(@socket, :new) %></span>

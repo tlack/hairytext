@@ -1,0 +1,32 @@
+<h1>Show Example</h1>
+
+<%= if @live_action in [:edit] do %>
+  <%= live_modal @socket, HTWeb.ExampleLive.FormComponent,
+    id: @example.id,
+    title: @page_title,
+    action: @live_action,
+    example: @example,
+    return_to: Routes.example_show_path(@socket, :show, @example) %>
+<% end %>
+
+<ul>
+
+  <li>
+    <strong>Text:</strong>
+    <%= @example.text %>
+  </li>
+
+  <li>
+    <strong>Label:</strong>
+    <%= @example.label %>
+  </li>
+
+  <li>
+    <strong>Source:</strong>
+    <%= @example.source %>
+  </li>
+
+</ul>
+
+<span><%= live_patch "Edit", to: Routes.example_show_path(@socket, :edit, @example), class: "button" %></span>
+<span><%= live_redirect "Back", to: Routes.example_index_path(@socket, :index) %></span>

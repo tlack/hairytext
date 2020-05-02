@@ -1,0 +1,54 @@
+<% # IO.inspect(assigns, label: :form_template) %>
+
+<h2><%= @title %></h2>
+
+<%= f = form_for @changeset, "#",
+  enctype: "multipart/form-data",
+  id: "example-form",
+  phx_target: @myself,
+  phx_change: "validate",
+  phx_submit: "save",
+  phx_hook: "textSelect"
+  %>
+
+  <!--
+  <%= label f, :image %>
+  <%= text_input f, :image %>
+  <%= error_tag f, :image %>
+  -->
+
+  <%= label f, :text %>
+  <%= textarea f, :text, phx_target: "#example-form" %>
+  <%= error_tag f, :text %>
+
+  <%= label f, :entities %>
+
+  <%= if @example.entities == nil or @example.entities == %{} do %>
+    <p>(Select text to create entities)</p>
+  <% else %>
+    <div class="entity-editor">
+    <%= for {{txt,lbl}, n} = v <- Enum.with_index @example.entities do %>
+      <div id="n<%= n %>">
+        <input id="t<%= txt %>" type="text" name="example[enttext][]" value="<%= txt %>">
+        <input list="entities<%= lbl %>" id="l<%= lbl %>" type="text" name="example[entlabels][]" value="<%= lbl %>">
+        <datalist id="entities<%= lbl %>">
+        <%= for i <- @all_entities do %>
+          <option value="<%= i %>" <%= if i == lbl, do: "selected", else: "" %>> <%= i %> </option>
+        <% end %>
+        </datalist>
+        <a class="button" phx-target="#example-form" phx-click="del_entity" phx-value-item="<%= txt %>">Del</a>
+      </div>
+    <%= end %>
+    </div>
+  <% end %>
+
+  <%= label f, :label %>
+  <%= select f, :label, @all_labels %>
+  <%= error_tag f, :label %>
+
+  <%= label f, :source %>
+  <%= text_input f, :source %>
+  <%= error_tag f, :source %>
+
+  <%= submit "Save", phx_disable_with: "Saving..." %>
+</form>

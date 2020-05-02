@@ -1,0 +1,64 @@
+<h1><%= @page_title %></h1>
+
+<%= if @live_action in [:new, :edit] do %>
+  <%= live_modal @socket, HTWeb.ExampleLive.FormComponent,
+    id: @example.id || :new,
+    title: @page_title,
+    action: @live_action,
+    example: @example,
+    project: "",
+    text: "",
+    return_to: Routes.example_index_path(@socket, :index) %>
+<% end %>
+
+<%= if @live_action == :new_with_text do %>
+  <%= live_modal @socket, HTWeb.ExampleLive.FormComponent,
+    id: @example.id || :new,
+    title: @page_title,
+    action: @live_action,
+    example: @example,
+    project: "",
+    return_to: Routes.example_index_path(@socket, :index) %>
+<% end %>
+
+<form phx-change="suggest" phx-submit="search">
+	<input type="text" id="q" name="q" value="<%= @query %>" placeholder="Search examples" autocomplete="off"/>
+  <div class="examples">
+    <%= for example <- @results do %>
+      <div>
+        <%= if example.image do %>
+        <figure>
+          <img src="<%= Data.example_image_url(example) %>" alt="(training example image)" />
+        </figure>
+        <% end %>
+        <%= if example.text do %>
+          <p><%= Util.entity_marked_example_text(example) %></p>
+        <% end %>
+        <div class="details">
+          <span><b>Label:</b> <%= example.label %></span>
+          <span>
+            <b>Entities:</b> <%= if example.entities do length(Map.keys(example.entities)) else 0 end %>
+          </span>
+          <%= live_redirect "Tag", to: Routes.example_index_path(@socket, :edit, example), class: "button"%>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <p>
+    <%= live_patch "New Example", to: Routes.example_index_path(@socket, :new), class: "button" %>
+  </p>
+  <p>
+    Labels in use: 
+    <%= for {label, count} <- Enum.frequencies @all_labels do %>
+      <%= if label != nil do %> <a href="<%= Routes.example_index_path(@socket, :label, label) %>"><%= label %> (<%= count %> examples)</a> <% end %>
+    <% end %>
+  </p>
+  <p>
+    Entities in use: 
+    <%= for {entity, count} <- Enum.frequencies @all_entities do %>
+      <%= if entity != nil do %> 
+        <a href="<%= Routes.example_index_path(@socket, :entity, entity) %>"><%= entity %> (<%= count %> examples)</a> 
+      <% end %>
+    <% end %>
+  </p>
+</form>
