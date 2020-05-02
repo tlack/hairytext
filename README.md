@@ -1,5 +1,7 @@
 # Hairy Text
 
+![HairyText diagram](https://i.imgur.com/bKR3zlf.png)
+
 Hairy Text is a tool for natural language processing. 
 
 With Hairy Text, you can perform named entity recognition (NER) tasks using the
@@ -54,7 +56,7 @@ database (totally self contained), and runs fine on a $5/mo server without a GPU
 * When creating a new example from the Predictions or Test screen, clicking on
 the example text to label it will cause it to reset. This is really annoying.
 Use a two-step editing process for now.
-* Projects support broken
+* Projects support broken in some ways (training and testing)
 
 # Notes
 
@@ -80,25 +82,26 @@ I wanted [Prodigy](https://prodi.gy/) but can't afford such bourgeoisie things.
 First, grab the code:
 
 ```
-	$ git clone https://github.com/tlack/hairytext/
+$ git clone https://github.com/tlack/hairytext/
 ```
 
 Then, install Spacy for Python. You'll need a recent version of Python. Consider using virtualenv with Hairytext. FYI, The Python code is in priv/python
 
 ```
-	$ pip install spacy
+$ pip install spacy
 ```
 
 Next, configure the default username/password:
 ```
-	$ vim config/config.exs
+$ vim config/config.exs
 ```
 
 Finally, install Elixir dependencies and start server:
 
 ```
-	$ mix deps.get
-	$ iex -S mix phx.server
+$ npm install --prefix assets
+$ mix deps.get
+$ iex -S mix phx.server
 ```
 
 Then open http://localhost:4141 to start playing. The default username and password is `admin`:`sohairy`
@@ -114,6 +117,42 @@ $ curl 'http://localhost:4141/api/predict?text=i+am+live+on+twitch' | json_pp
 		"entities" : {
 			"service" : "twitch"
 		}
+}
+```
+
+# Use from iex shell
+
+Make a prediction for some new text. This returns the raw Spacy result format.
+
+```
+iex(48)> Spacy.predict("i want to go live on whuwhuwhaaaaat at 7am")
+	%{
+		'classification' => %{
+			[] => 0.9619296193122864,
+			'bad' => 0.03623370826244354,
+			'good' => 0.9784072041511536
+		},
+		'entities' => [["service", "whuwhuwhaaaaat"], ["when", "7am"]],
+		'text' => "i want to go live on whuwhuwhaaaaat at 7am"
+	}
+```
+
+See the raw data about an example in the system:
+
+```
+iex(418)> HT.Data.list_examples |> List.last |> Map.get(:id) |> HT.Data.get_example!
+%HT.Data.Example{
+__meta__: #Ecto.Schema.Metadata<:built, "examples">,
+	entities: %{},
+	id: "e94e1954-0548-4f51-9570-e63cd298d2d7",
+	image: nil,
+	inserted_at: ~U[2020-04-30 04:05:34.965387Z],
+	label: "bad",
+	project: "9d00fa70-df5c-4a3a-9f0d-8c53f3345417",
+	source: nil,
+	status: nil,
+	text: "i hate when people start live streaming. twitch sucks.",
+	updated_at: ~U[2020-05-02 06:42:11.799197Z]
 }
 ```
 
