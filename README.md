@@ -8,7 +8,7 @@ improve your model. All this from a normal looking and mobile-friendly web
 application.
 
 It is written in Elixir + Phoenix LiveView and Python, doesn't require a
-database, and runs fine on a $5/mo server without a GPU.
+database (totally self contained), and runs fine on a $5/mo server without a GPU.
 
 # Screenshot
 
@@ -35,16 +35,18 @@ database, and runs fine on a $5/mo server without a GPU.
 * Label text inside examples as entities - for instance "time reference" or "place name"
 * Filter by entity tags or labels
 * Train online via web interface and report live training progress (rough..)
+* Support for multiple projects (some bugs)
 
 # Future
 
+* Make into embeddable component like LiveDashboard
 * Support for "one at a time" editing that's more about a workflow of doing one labeling task after another
-* Support for multiple projects (really half assed right now)
 * Image tagging (including objects inside images)
 * Assist in generating low-confidence predictions to more quickly improve model
 * Each project should have its own DETS files
-* API to label, view predictions log
+* APIs to: label examples new and old, bulk predict, view predictions log
 * Learn from embeddings (BERT, I'm looking at you)
+* uPlot training graphs
 
 # Bugs
 
