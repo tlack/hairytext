@@ -10,7 +10,7 @@ defmodule HT.Repo do
     state =
       for schema <- schemas(), into: %{} do
         fname = Path.join(db_folder, [to_string(schema), ".dets"])
-        {:ok, handle} = :dets.open_file(String.to_atom(fname), file: to_charlist(fname))
+        {:ok, handle} = :dets.open_file(String.to_atom(fname), file: to_charlist(fname), type: :set)
         {schema, handle}
       end
 
@@ -139,16 +139,16 @@ defmodule HT.Repo do
     data =
       case :dets.match(handle, {id, :"$1"}) do
         [] ->
-          []
+          nil
 
         other ->
-          other
+          record = other
           |> hd
           |> hd
           |> Map.put(:id, id)
-      end
 
-    struct(type, data)
+          struct(type, record)
+      end
   end
 
   defp make_row([{id, row}], type) when is_map(row) do
