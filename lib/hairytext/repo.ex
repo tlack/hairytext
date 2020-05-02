@@ -10,7 +10,10 @@ defmodule HT.Repo do
     state =
       for schema <- schemas(), into: %{} do
         fname = Path.join(db_folder, [to_string(schema), ".dets"])
-        {:ok, handle} = :dets.open_file(String.to_atom(fname), file: to_charlist(fname), type: :set)
+
+        {:ok, handle} =
+          :dets.open_file(String.to_atom(fname), file: to_charlist(fname), type: :set)
+
         {schema, handle}
       end
 
@@ -142,10 +145,11 @@ defmodule HT.Repo do
           nil
 
         other ->
-          record = other
-          |> hd
-          |> hd
-          |> Map.put(:id, id)
+          record =
+            other
+            |> hd
+            |> hd
+            |> Map.put(:id, id)
 
           struct(type, record)
       end

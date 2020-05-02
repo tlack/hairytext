@@ -37,18 +37,17 @@ defmodule HTWeb.Router do
     live "/examples/:id", ExampleLive.Show, :show
     live "/examples/:id/show/edit", ExampleLive.Show, :edit
 
-    live "/predictions", PredictionLive, :index 
-    live "/predictions/:sort", PredictionLive, :index 
+    live "/predictions", PredictionLive, :index
+    live "/predictions/:sort", PredictionLive, :index
     live "/test", TestLive, :index
     live "/train", TrainLive, :index
     live "/train/go", TrainLive, :go
-
   end
 
   scope "/api", HTWeb do
-     pipe_through :api
-     get "/export/:id", APIController, :export_project
-     get "/predict", APIController, :predict
+    pipe_through :api
+    get "/export/:id", APIController, :export_project
+    get "/predict", APIController, :predict
   end
 
   # Enables LiveDashboard only for development

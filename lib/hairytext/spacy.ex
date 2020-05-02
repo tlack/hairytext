@@ -32,20 +32,23 @@ defmodule Spacy do
 
   defp make_ents(%Example{entities: nil} = _row), do: %{}
   defp make_ents(%Example{entities: ""} = _row), do: %{}
+
   defp make_ents(%Example{} = row) do
-    Enum.map row.entities, fn {k,v} ->
+    Enum.map(row.entities, fn {k, v} ->
       IO.inspect({row.text, k, v})
+
       case :binary.match(row.text, k) do
-        {pos, len} -> 
+        {pos, len} ->
           {pos, pos + len, v}
+
         :nomatch ->
           nil
       end
-    end
+    end)
   end
 
   defp make_spacy_row(%Example{} = row) do
-    ents = make_ents(row) |> List.to_tuple
+    ents = make_ents(row) |> List.to_tuple()
     cats = make_cats(row)
     {row.text, {ents, cats}}
   end
@@ -54,11 +57,12 @@ defmodule Spacy do
     {text, {[], ''}}
   end
 
-  def handle_cast({:train, examples, allowed_labels, clientpid}, pid) when is_list(examples) and is_list(allowed_labels) do
-    IO.inspect({:train, pid})
-    e2 = Enum.filter(examples, fn x -> Util.has(allowed_labels, x.label) end) |>  Enum.map &make_spacy_row/1
-    IO.inspect(e2, label: :train_dataset)
+  def handle_cast({:train, examples, allowed_labels, clientpid}, pid)
+      when is_list(examples) and is_list(allowed_labels) do
+    e2 =
+      Enum.filter(examples, fn x -> Util.has(allowed_labels, x.label) end)
+      |> Enum.map(&make_spacy_row/1)
+
     {:noreply, :python.call(pid, :hairytext, :train, [clientpid, e2]), pid}
   end
-
 end
