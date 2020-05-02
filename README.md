@@ -28,7 +28,8 @@ database, and runs fine on a $5/mo server without a GPU.
 * Interactive "test" console lets you quickly debug your model
 * Refreshless but highly dynamic Phoenix Liveview web-based user interface (like React, without it)
 * User logins with HTTP AUTH password check
-* JSON API for making predictions (to tie it into the rest of your project)
+* Export a .ZIP of your labeled examples and prediction history (both convenient .JSON files)
+* REST JSON API for making predictions (to tie it into the rest of your project)
 * API predictions stored in log and reviewable in app
 * Label examples with a category
 * Label text inside examples as entities - for instance "time reference" or "place name"
