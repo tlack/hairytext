@@ -19,7 +19,7 @@ defmodule HTWeb.Router do
   scope "/", HTWeb do
     pipe_through :browser
 
-    live "/", PageLive, :index
+    live "/", ProjectLive.Index, :index
     live "/projects", ProjectLive.Index, :index
     live "/projects/new", ProjectLive.Index, :new
     live "/projects/:id/edit", ProjectLive.Index, :edit
