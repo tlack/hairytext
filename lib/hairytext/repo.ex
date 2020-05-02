@@ -25,6 +25,10 @@ defmodule HT.Repo do
     GenServer.call(HTRepo, {:all, thing})
   end
 
+  def delete(thing) do
+    GenServer.call(HTRepo, {:delete, thing})
+  end
+
   def get!(thing) when is_struct(thing) do
     GenServer.call(HTRepo, {:get, thing})
   end
@@ -35,6 +39,10 @@ defmodule HT.Repo do
 
   def insert(%_type{} = thing) when is_struct(thing) do
     GenServer.call(HTRepo, {:insert, thing})
+  end
+
+  def migrate(thing, callback) when is_struct(thing) do
+    GenServer.call(HTRepo, {:migrate, thing, callback})
   end
 
   def pids() do
@@ -53,8 +61,7 @@ defmodule HT.Repo do
 
   def handle_call({:all, type}, _from, state) when is_atom(type) do
     handle = Map.get(state, type)
-    data = :dets.match(handle, :"$1")
-    data2 = Enum.map(data, fn x -> make_row(x, type) end)
+    data2 = fetch_all(type, handle)
     {:reply, data2, state}
   end
 
@@ -62,11 +69,25 @@ defmodule HT.Repo do
     handle_call({:all, type}, from, state)
   end
 
+  def handle_call({:delete, %type{id: id} = thing}, _from, state) do
+    handle = Map.get(state, type)
+    delete_id(type, handle, id)
+    {:reply, :ok, state}
+  end
+
   def handle_call({:get, %type{} = thing}, _from, state) do
     handle = Map.get(state, type)
     id = Map.get(thing, :id)
     data = get_by_id!(type, handle, id)
     {:reply, data, state}
+  end
+
+  def handle_call({:migrate, %type{}, callback}, _from, state) when is_function(callback) do
+    handle = Map.get(state, type)
+    items = fetch_all(type, handle)
+    updates = Enum.map(items, &callback.(&1, type)) |> Util.except([%{}, nil])
+    log = Enum.each(updates, &update_with_changeset(&1, state))
+    {:reply, log, state}
   end
 
   def handle_call({:insert, %Ecto.Changeset{valid?: true} = changeset}, _from, state) do
@@ -99,50 +120,19 @@ defmodule HT.Repo do
   end
 
   def handle_call({:update, %Ecto.Changeset{valid?: true} = changeset}, _from, state) do
-    with %type{} = query = changeset.data do
-      handle = Map.get(state, type)
-      id = Map.get(query, :id)
-
-      data =
-        get_by_id!(type, handle, id)
-        |> Map.put(:updated_at, DateTime.utc_now())
-
-      data2 =
-        Enum.reduce(changeset.changes, data, fn {k, v}, acc ->
-          Map.put(acc, k, v)
-        end)
-
-      data3 = data2 |> Map.drop([:__meta__, :__schema__, :__struct__])
-      :ok = :dets.insert(handle, {id, data3})
-      {:reply, {:ok, data2}, state}
-    end
+    data2 = update_with_changeset(changeset, state)
+    {:reply, {:ok, data2}, state}
   end
 
-  defp uuid() do
-    Ecto.UUID.generate()
+  # HELPERS
+
+  defp delete_id(type, handle, id) do
+    :ok = :dets.delete(handle, id)
   end
 
-  defp unnil(map, key, new_val_fun) do
-    if not Map.has_key?(map, key) or Map.get(map, key) == nil do
-      Map.put(map, key, new_val_fun.())
-    else
-      map
-    end
-  end
-
-  defp schemas() do
-    {:ok, modules} = :application.get_key(:hairytext, :modules)
-
-    modules
-    |> Enum.filter(&({:__schema__, 1} in &1.__info__(:functions)))
-  end
-
-  defp make_row([{id, row}], type) when is_map(row) do
-    make_row({id, row}, type)
-  end
-
-  defp make_row({id, row}, type) when is_map(row) do
-    struct(type, row |> Map.put(:id, id))
+  defp fetch_all(type, handle) do
+    data = :dets.match(handle, :"$1")
+    data2 = Enum.map(data, fn x -> make_row(x, type) end)
   end
 
   defp get_by_id!(type, handle, id) do
@@ -159,5 +149,51 @@ defmodule HT.Repo do
       end
 
     struct(type, data)
+  end
+
+  defp make_row([{id, row}], type) when is_map(row) do
+    make_row({id, row}, type)
+  end
+
+  defp make_row({id, row}, type) when is_map(row) do
+    struct(type, row |> Map.put(:id, id))
+  end
+
+  defp schemas() do
+    {:ok, modules} = :application.get_key(:hairytext, :modules)
+
+    modules
+    |> Enum.filter(&({:__schema__, 1} in &1.__info__(:functions)))
+  end
+
+  defp update_with_changeset(%Ecto.Changeset{} = changeset, state) do
+    with %type{} = query = changeset.data do
+      handle = Map.get(state, type)
+      id = Map.get(query, :id)
+
+      data =
+        get_by_id!(type, handle, id)
+        |> Map.put(:updated_at, DateTime.utc_now())
+
+      data2 =
+        Enum.reduce(changeset.changes, data, fn {k, v}, acc ->
+          Map.put(acc, k, v)
+        end)
+
+      data3 = data2 |> Map.drop([:__meta__, :__schema__, :__struct__])
+      :ok = :dets.insert(handle, {id, data3})
+    end
+  end
+
+  defp uuid() do
+    Ecto.UUID.generate()
+  end
+
+  defp unnil(map, key, new_val_fun) do
+    if not Map.has_key?(map, key) or Map.get(map, key) == nil do
+      Map.put(map, key, new_val_fun.())
+    else
+      map
+    end
   end
 end
