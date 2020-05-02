@@ -32,7 +32,7 @@ defmodule HTWeb.ExampleLive.Index do
     socket
     |> assign_metadata()
     |> assign(:page_title, "New Example")
-    |> assign(:example, %Example{})
+    |> assign(:example, %Example{project: socket.assigns.cur_project_id})
   end
 
   defp apply_action(socket, :new_with_text, params) do
@@ -40,7 +40,9 @@ defmodule HTWeb.ExampleLive.Index do
     socket
     |> assign_metadata()
     |> assign(:page_title, "New Example")
-    |> assign(:example, %Example{text: params["text"]})
+    |> assign(:example, %Example{
+        text: params["text"], 
+        project: socket.assigns.cur_project_id})
   end
 
   defp apply_action(socket, :index, _params) do
@@ -57,8 +59,7 @@ defmodule HTWeb.ExampleLive.Index do
 
   defp apply_action(socket, :project, %{"project" => pid}) do
     proj = Data.get_project!(pid)
-    examples = fetch_examples()
-    ex2 = examples |> Enum.filter fn x -> x.project == pid end
+    ex2 = Data.list_examples_for_project(pid)
     socket
     |> assign(:results, ex2)
     |> assign(:project, proj.id)

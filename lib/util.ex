@@ -27,12 +27,17 @@ defmodule Util do
     # but does when they are atoms
     Enum.zip(keys, vals) |> Enum.into(%{})
   end
+  def map(a_struct) when is_struct(a_struct) do
+      Map.from_struct(a_struct) |> Map.drop([:__meta__, :__schema__, :__struct__])
+  end
   def map(kv_pairs) when is_list(kv_pairs) and is_tuple(hd(kv_pairs)) do
     IO.inspect(kv_pairs, label: :Util_map)
     if kv_pairs == [{}], do: %{}, else: Enum.into(kv_pairs |> Enum.filter(&(&1!={})), %{})
   end
   def map([]), do: %{}
   def map([{}]), do: %{}
+
+  def maps(list) when is_list(list) and is_struct(hd(list)), do: Enum.map(list, &map/1)
 
   def pluck([], _key), do: []
   def pluck(list, key) when is_list(list) and is_map(hd(list)) do
@@ -41,6 +46,8 @@ defmodule Util do
 
   def take(str, n) when is_binary(str), do: String.slice(str, 0, n)
   def take(list, n), do: Enum.take(list, n)
+
+  # More utility style stuff:
 
   def entity_marked_example_text(%HT.Data.Prediction{} = data) do
     IO.inspect(data, label: :entity_marked_example_text)
@@ -77,6 +84,7 @@ defmodule Util do
     pred = %HT.Data.Prediction{text: to_string(result['text']), label: to_string(classification), label_confidence: cls[classification], entities: ents}
   end
 
-end
+  def ugly_datetime(), do: DateTime.utc_now() |> DateTime.to_iso8601(:basic)
 
+end
 
