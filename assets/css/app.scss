@@ -28,7 +28,7 @@
 .phx-modal {
   opacity: 1!important;
   position: fixed;
-  z-index: 1;
+  z-index: 500;
   left: 0;
   top: 0;
   width: 100%;
@@ -161,7 +161,7 @@ $grid: 50px;
 			text-transform: uppercase;
 			top: 25px;
 			right: 0px;
-			z-index: 100;
+			z-index: 5;
 		}
 	}
 }
