@@ -3,23 +3,20 @@ defmodule HTWeb.ExampleLive.FormComponent do
 
   alias HT.Data
 
-  def mount(params, session, socket) do
-		IO.inspect({params, session}, label: ExampleLive_form_mount)
-		{:ok, socket}
-	end
-
   @impl true
   def update(%{example: example} = assigns, socket) do
-		IO.inspect({assigns}, label: :ExampleLiveForm_update)
+		IO.inspect({assigns,socket}, label: :ExampleLiveForm_update)
     changeset = Data.change_example(example) # struct(HT.Data.Example, example))
-    examples = Data.list_examples()
-    labels = Util.pluck(examples, :label) |> Enum.uniq()
-    entities = Util.pluck(examples, :entities) |> Enum.flat_map(&Map.values/1) |> Enum.uniq()
-    s2 = socket |> assign(:all_labels, labels) |> assign(:all_entities, entities) 
-    {:ok,
-     s2
-     |> assign(assigns)
-     |> assign(:changeset, changeset)}
+    pid = assigns.project
+    {labels, entities} = Util.project_labels_and_entities(Data.get_project!(pid))
+    s2 = socket 
+      |> assign(assigns)
+      |> assign(:project, Data.get_project!(pid))
+      |> assign(:all_labels, labels) 
+      |> assign(:all_entities, entities) 
+      |> assign(:changeset, changeset)
+    IO.inspect(s2.assigns, label: :ExampleLiveForm_s2_assigns)
+    {:ok, s2}
   end
 
   @impl true
@@ -49,10 +46,9 @@ defmodule HTWeb.ExampleLive.FormComponent do
     assigns = socket.assigns
     IO.inspect(assigns, label: :event_save_assigns)
     p2 = case Map.has_key? example_params, "entlabels" do
-      true -> example_params |> Map.put "entities", make_entities(example_params)
-      false -> example_params |> Map.put "entities", %{}
+      true -> example_params |> Map.put("entities", make_entities(example_params))
+      false -> example_params |> Map.put("entities", %{})
     end
-      |> Map.put "project", (if Map.has_key?(assigns, :project) do assigns.project else "" end)
     IO.inspect(p2, label: :p2)
     save_example(socket, socket.assigns.action, p2)
   end

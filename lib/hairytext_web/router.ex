@@ -26,16 +26,13 @@ defmodule HTWeb.Router do
     live "/projects/:id/edit", ProjectLive.Index, :edit
     live "/projects/:id", ProjectLive.Show, :show
     live "/projects/:id/show/edit", ProjectLive.Show, :edit
+    live "/projects/:set_proj/default/", ProjectLive.Index, :set_default
 
     live "/examples", ExampleLive.Index, :index
-    live "/examples/project/:project", ExampleLive.Index, :project
-    live "/examples/label/:label", ExampleLive.Index, :label
-    live "/examples/entity/:entity", ExampleLive.Index, :entity
+    live "/examples/delete/:id", ExampleLive.Index, :delete
     live "/examples/new", ExampleLive.Index, :new
     live "/examples/new/text/:text", ExampleLive.Index, :new_with_text
     live "/examples/:id/edit", ExampleLive.Index, :edit
-    live "/examples/:id", ExampleLive.Show, :show
-    live "/examples/:id/show/edit", ExampleLive.Show, :edit
 
     live "/predictions", PredictionLive, :index
     live "/predictions/:sort", PredictionLive, :index

@@ -6,7 +6,14 @@ defmodule HTWeb.TrainLive do
   @impl true
   def mount(params, session, socket) do
 		IO.inspect({params, session}, label: TrainLive_mount)
-    {:ok, socket |> assign(:log, [])} 
+    ex2 = Data.list_examples_for_project(session["cur_project"].id)
+    {labels, entities} = Util.label_stats_for_examples(ex2)
+    s2=socket 
+      |> HTWeb.SessionSetup.assigns(session) 
+      |> assign(:all_labels, labels)
+      |> assign(:all_entities, entities)
+      |> assign(:log, [])
+    {:ok, s2} 
   end
 
   @impl true
@@ -15,14 +22,39 @@ defmodule HTWeb.TrainLive do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
-  def handle_info({'loss', data}, socket) do
+  def handle_info(msg, socket) do
+    IO.inspect(msg, label: :handle_info)
+    data = elem(msg, 1)
     {:noreply, socket |> assign(:log, [Jason.decode!(data) | Util.take(socket.assigns.log, 25)])}
   end
 
-  defp apply_action(socket, :go, params) do
-    examples = HT.Data.list_examples
+  def handle_event("train", params, socket) do
+    cp = socket.assigns.cur_project
+    examples = HT.Data.list_examples_for_project(cp.id)
+      |> Enum.filter(&(&1.label != nil and Util.head(&1.label) != "_"))
     labels = Util.pluck(examples, :label)
-    accuracy = Spacy.train(examples, labels, self)
+    IO.inspect(labels, label: :lbl)
+    out = if cp.project_type == "text" do
+      HT.Spacy.train(examples, labels, self(), cp.id)
+    else
+      HT.ImageNet.train(examples, labels, self(), cp.id)
+    end
+    IO.inspect(out, label: :train_go)
+		{:noreply, assign(socket, log: [])}
+  end
+
+  defp apply_action(socket, :go, params) do
+    cp = socket.assigns.cur_project
+    examples = HT.Data.list_examples_for_project(cp.id)
+      |> Enum.filter(&(&1.label != nil and Util.head(&1.label) != "_"))
+    labels = Util.pluck(examples, :label)
+    IO.inspect(labels, label: :lbl)
+    out = if cp.project_type == "text" do
+      HT.Spacy.train(examples, labels, self(), cp.id)
+    else
+      HT.ImageNet.train(examples, labels, self(), cp.id)
+    end
+    IO.inspect(out, label: :train_go)
     socket |> assign(:log, [])
   end
 
@@ -32,33 +64,60 @@ defmodule HTWeb.TrainLive do
   end
 
   def render(assigns) do
+    # XXX pass in # of epochs from UI or model config tool! THIS IS MADNESS!
     ~L"""
 
     <h1>Training</h1>
 
     <p>
-      <%= live_patch "Start", to: Routes.train_path(@socket, :go), class: "button" %></span>
+      <a class="button" phx-click="train" phx-disable-with="Training..">Train</a>
     </p>
     
     <%= if @log != [] do %>
       <h3>Training status</h3>
-      <table>
-      <thead>
-      <tr>
-        <th>Epoch</th>
-        <th>NER Loss</th>
-        <th>Classifier Loss</th>
-      </tr>
-      </thead>
-      <%= for x <- @log do %> 
-      <tr>
-        <td><%= x["epoch"] %></td>
-        <td><%= x["ner"] %></td>
-        <td><%= Util.fmt_pct x["textcat"] %></td>
-      </tr>
+
+      <%= if @cur_project.project_type == "text" do %>
+        <table>
+        <thead>
+        <tr>
+          <th>Epoch</th>
+          <th>NER Loss</th>
+          <th>Classifier Loss</th>
+        </tr>
+        </thead>
+        <%= for x <- @log do %> 
+        <tr>
+          <td><%= x["epoch"] %></td>
+          <td><%= x["ner"] %></td>
+          <td><%= Util.fmt_pct x["textcat"] %></td>
+        </tr>
+        <% end %>
+        </table>
+      <% else %>
+        <%= for x <- @log do %> 
+          <p><%= Jason.encode!(x) %></p>
+        <% end %>
       <% end %>
-      </table>
     <% end %>
+
+    <p>
+      Labels in use: 
+      <%= for {label, count} <- @all_labels do %>
+        <%= if label != nil do %> 
+          <a href="<%= Routes.example_index_path(@socket, :index, label: label) %>"><%= label %> (<%= count %> examples)</a> 
+        <% else %>
+          <a href="<%= Routes.example_index_path(@socket, :index, label: "_") %>">UNLABELED (<%= count %> examples)</a> 
+        <% end %>
+      <% end %>
+    </p>
+    <p>
+      Entities in use: 
+      <%= for {entity, count} <- @all_entities do %>
+        <%= if entity != nil and entity != %{} do %> 
+          <a href="<%= Routes.example_index_path(@socket, :entity, entity) %>"><%= entity %> (<%= count %> examples)</a> 
+        <% end %>
+      <% end %>
+    </p>
     """
   end
 end

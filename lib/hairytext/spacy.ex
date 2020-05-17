@@ -1,4 +1,4 @@
-defmodule Spacy do
+defmodule HT.Spacy do
   use GenServer
   alias HT.Data.Example
 
@@ -10,8 +10,8 @@ defmodule Spacy do
     GenServer.call(Spacy, {:predict, text})
   end
 
-  def train(examples, allowed_labels, clientpid) do
-    GenServer.cast(Spacy, {:train, examples, allowed_labels, clientpid})
+  def train(examples, allowed_labels, clientpid, project_id) do
+    GenServer.cast(Spacy, {:train, examples, allowed_labels, clientpid, project_id})
   end
 
   # Implementation:
@@ -57,7 +57,7 @@ defmodule Spacy do
     {text, {[], ''}}
   end
 
-  def handle_cast({:train, examples, allowed_labels, clientpid}, pid)
+  def handle_cast({:train, examples, allowed_labels, clientpid, project_id}, pid)
       when is_list(examples) and is_list(allowed_labels) do
     e2 =
       Enum.filter(examples, fn x -> Util.has(allowed_labels, x.label) end)

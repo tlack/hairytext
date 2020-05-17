@@ -21,16 +21,21 @@ defmodule HTWeb.ProjectLive.Index do
     |> assign(:project, Data.get_project!(id))
   end
 
+  defp apply_action(socket, :index, _params) do
+    socket
+    |> assign(:page_title, "Listing Projects")
+    |> assign(:project, nil)
+  end
+
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "New Project")
     |> assign(:project, %Project{})
   end
 
-  defp apply_action(socket, :index, _params) do
+  defp apply_action(socket, :set_default, _params) do
     socket
-    |> assign(:page_title, "Listing Projects")
-    |> assign(:project, nil)
+    |> redirect(to: "/examples")
   end
 
   @impl true

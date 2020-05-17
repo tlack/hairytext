@@ -13,6 +13,7 @@ defmodule HT.Data do
   def get_example!(id), do: Repo.get!(Example, id)
 
   def create_example(attrs \\ %{}) do
+    IO.inspect(attrs, label: :create_example)
     %Example{}
     |> Example.changeset(attrs)
     |> Repo.insert()
@@ -20,7 +21,6 @@ defmodule HT.Data do
 
   def update_example(%Example{} = example, attrs) do
     IO.inspect({example, attrs}, label: :update_example)
-
     example
     |> Example.changeset(attrs)
     |> Repo.update()

@@ -35,6 +35,14 @@ defmodule Util do
   def key(map) when is_map(map), do: Map.keys(map)
   def key(list) when is_list(list), do: Range.new(0, length(list))
 
+  def friendly_hash(str), do: String.slice(str, 0, 5)
+
+  def head(list) when is_list(list), do: hd(list)
+  def head(str)  when is_binary(str), do: String.slice(str, 0, 1) # XXX better way?
+
+  def len(str) when is_binary(str), do: String.length(str)
+  def len(list) when is_list(list), do: length(list)
+
   def map(keys, vals) when is_list(keys) and is_list(vals) do
     # Enum.zip(keys,vals) doesnt create a map when the keys are strings
     # but does when they are atoms
@@ -51,6 +59,10 @@ defmodule Util do
   def map([{}]), do: %{}
 
   def maps(list) when is_list(list) and is_struct(hd(list)), do: Enum.map(list, &map/1)
+
+  def map_to_keywords(map) when is_map(map) do
+    Enum.map(map, fn({key, value}) -> {String.to_existing_atom(key), value} end)
+  end
 
   def pluck([], _key), do: []
   def pluck(list, key) when is_list(list) and is_map(hd(list)) do
@@ -87,6 +99,10 @@ defmodule Util do
     end
   end
 
+  def example_image_url(example) do
+    "/image_examples/#{example.project}/#{example.image}"
+  end
+
   def from_spacy_prediction(%HT.Data.Prediction{} = pred), do: pred
 
   def from_spacy_prediction(result) do
@@ -97,7 +113,45 @@ defmodule Util do
     pred = %HT.Data.Prediction{text: to_string(result['text']), label: to_string(classification), label_confidence: cls[classification], entities: ents}
   end
 
+  def label_stats_for_examples(ex) do
+    labels = pluck(ex, :label) |> Enum.frequencies
+    ents = pluck(ex, :entities) |> Enum.filter(& &1 == %{}) |> Enum.frequencies
+    {labels, ents}
+  end
+
+  def project_labels_and_entities(cp) do
+    labels = if cp.labels, do: String.split(cp.labels, ","), else: []
+    entities = if cp.entities, do: String.split(cp.entities, ","), else: []
+    {labels, entities}
+  end
+
   def ugly_datetime(), do: DateTime.utc_now() |> DateTime.to_iso8601(:basic)
+
+  def upsert_examples_from_image_folder() do
+    image_dir = Application.fetch_env!(:hairytext, HT.ImageNet)[:image_dir]
+    abs_image_dir = Path.expand(image_dir)
+    fnames = Path.wildcard("#{abs_image_dir}/**/*.{jpg,png}")
+      |> Enum.map &String.replace(&1, abs_image_dir, "")
+    examples_by_proj = HT.Data.list_examples() 
+      |> Enum.filter(& &1.image)
+      |> Enum.group_by(& &1.project)
+    Enum.map(fnames, fn x -> 
+      [_, proj, fname] = Path.split(x)
+      proj_imgs = Map.get(examples_by_proj, proj) |> pluck(:image)
+      
+      case Enum.find(proj_imgs, & &1==fname) do
+        nil -> 
+          ex = %{"image" => fname, "project" => proj}
+          IO.inspect(ex, label: :new_example)
+          out = HT.Data.create_example(ex)
+        _ ->
+          IO.inspect({:skipped, fname})
+      end
+    end)
+    IO.inspect(fnames)
+    IO.inspect(examples_by_proj)
+  end
+
 
 end
 

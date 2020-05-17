@@ -6,6 +6,7 @@ defmodule HT.Data.Project do
     field :entities, :string
     field :labels, :string
     field :name, :string
+    field :project_type, :string
 
     timestamps()
   end
@@ -13,7 +14,7 @@ defmodule HT.Data.Project do
   @doc false
   def changeset(project, attrs) do
     project
-    |> cast(attrs, [:name, :labels, :entities])
+    |> cast(attrs, [:name, :labels, :entities, :project_type])
     |> validate_required([:name])
   end
 end

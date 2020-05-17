@@ -11,44 +11,63 @@
   phx_hook: "textSelect"
   %>
 
-  <!--
-  <%= label f, :image %>
-  <%= text_input f, :image %>
-  <%= error_tag f, :image %>
-  -->
+  <input type="hidden" name="example[project]" value="<%= @project.id %>">
 
-  <%= label f, :text %>
-  <%= textarea f, :text, phx_target: "#example-form" %>
-  <%= error_tag f, :text %>
+  <%= if !@example.text do %>
 
-  <%= label f, :entities %>
-
-  <%= if @example.entities == nil or @example.entities == %{} do %>
-    <p>(Select text to create entities)</p>
-  <% else %>
-    <div class="entity-editor">
-    <%= for {{txt,lbl}, n} = v <- Enum.with_index @example.entities do %>
-      <div id="n<%= n %>">
-        <input id="t<%= txt %>" type="text" name="example[enttext][]" value="<%= txt %>">
-        <input list="entities<%= lbl %>" id="l<%= lbl %>" type="text" name="example[entlabels][]" value="<%= lbl %>">
-        <datalist id="entities<%= lbl %>">
-        <%= for i <- @all_entities do %>
-          <option value="<%= i %>" <%= if i == lbl, do: "selected", else: "" %>> <%= i %> </option>
-        <% end %>
-        </datalist>
-        <a class="button" phx-target="#example-form" phx-click="del_entity" phx-value-item="<%= txt %>">Del</a>
-      </div>
-    <%= end %>
-    </div>
+    <%= if @example.image do %>
+    <figure class="example_image">
+      <img src="<%= Util.example_image_url(@example) %>" alt="(training example image)" />
+    </figure>
+    <% end %>
+    <%= label f, :image %>
+    <%= text_input f, :image %>
+    <%= error_tag f, :image %>
   <% end %>
 
-  <%= label f, :label %>
-  <%= select f, :label, @all_labels %>
-  <%= error_tag f, :label %>
+  <%= if !@example.image do %>
+    <%= label f, :text %>
+    <%= textarea f, :text, phx_target: "#example-form" %>
+    <%= error_tag f, :text %>
+  <% end %>
+
+  <%= if !@example.image do %>
+    <%= label f, :entities %>
+    <%= if @example.entities == nil or @example.entities == %{} do %>
+      <p>(Select text to create entities)</p>
+    <% else %>
+      <div class="entity-editor">
+      <%= for {{txt,lbl}, n} = v <- Enum.with_index @example.entities do %>
+        <div id="n<%= n %>">
+          <input id="t<%= txt %>" type="text" name="example[enttext][]" value="<%= txt %>">
+          <input list="entities<%= lbl %>" id="l<%= lbl %>" type="text" name="example[entlabels][]" value="<%= lbl %>">
+          <datalist id="entities<%= lbl %>">
+          <%= for i <- @all_entities do %>
+            <option value="<%= i %>" <%= if i == lbl, do: "selected", else: "" %>> <%= i %> </option>
+          <% end %>
+          </datalist>
+          <a class="button" phx-target="#example-form" phx-click="del_entity" phx-value-item="<%= txt %>">Del</a>
+        </div>
+      <%= end %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <%= if length(@all_labels) do %>
+    <%= label f, :label %>
+    <%= select f, :label, ["_unknown" | @all_labels] %>
+    <%= error_tag f, :label %>
+  <% end %>
 
   <%= label f, :source %>
   <%= text_input f, :source %>
   <%= error_tag f, :source %>
 
-  <%= submit "Save", phx_disable_with: "Saving..." %>
+  <div class="button-bar">
+    <span><%= submit "Save", phx_disable_with: "Saving..." %> &nbsp;&nbsp; in <i><%= @project.name %></i></span>
+    <%= if @example.id do %>
+      <span><%= live_patch "Del", to: Routes.example_index_path(@socket, :delete, @example), class: "button"%></span>
+    <% end %>
+  </div>
 </form>
+

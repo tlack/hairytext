@@ -106,6 +106,7 @@ defmodule HT.Repo do
       id = Map.get(v2, :id)
       handle = Map.get(state, type)
       item = {id, v2}
+      IO.inspect(item, label: :insert)
 
       case :dets.insert(handle, item) do
         :ok -> {:reply, {:ok, item}, state}

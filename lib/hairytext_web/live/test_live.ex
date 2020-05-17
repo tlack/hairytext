@@ -22,7 +22,7 @@ defmodule HTWeb.TestLive do
 
   @impl true
   def handle_event("predict", %{"q" => query}, socket) do
-    p = Spacy.predict(query)
+    p = HT.Spacy.predict(query)
     {:noreply, assign(socket, prediction: p, query: query)}
   end
 

@@ -18,5 +18,9 @@
   <%= text_input f, :entities %>
   <%= error_tag f, :entities %>
 
+  <%= label f, :project_type %>
+  <%= select f, :project_type, ["text", "image"] %>
+  <%= error_tag f, :project_type %>
+
   <%= submit "Save", phx_disable_with: "Saving..." %>
 </form>

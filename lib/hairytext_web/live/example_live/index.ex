@@ -6,7 +6,6 @@ defmodule HTWeb.ExampleLive.Index do
 
   @impl true
   def mount(params, session, socket) do
-		IO.inspect({params, session}, label: ExampleLive_mount)
     {:ok, 
 			socket 
       |> HTWeb.SessionSetup.assigns(session)
@@ -16,77 +15,67 @@ defmodule HTWeb.ExampleLive.Index do
 
   @impl true
   def handle_params(params, url, socket) do
-		IO.inspect({params, url}, label: ExampleLive_handle_params)
-    s2 = socket |> assign(:my_url, url)
+    s2 = socket |> assign(:filter, params["filter"] || %{}) 
     {:noreply, apply_action(s2, socket.assigns.live_action, params)}
+  end
+
+  defp apply_action(socket, :delete, %{"id" => id}) do
+    example = Data.get_example!(id)
+    case example do
+      nil -> nil    # already deleted
+      _other -> :ok = Data.delete_example(example)
+    end
+    socket
+    |> assign_metadata()
+    |> assign(:page_title, "Examples")
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
     |> assign_metadata()
-    |> assign(:page_title, "Edit Example")
+    |> assign(:page_title, "Examples")
     |> assign(:example, Data.get_example!(id))
   end
 
-  defp apply_action(socket, :new, _params) do
+  defp apply_action(socket, :new, params) do
     socket
     |> assign_metadata()
-    |> assign(:page_title, "New Example")
+    |> assign(:back_to, params["back_to"])
+    |> assign(:page_title, "Examples")
     |> assign(:example, %Example{project: socket.assigns.cur_project_id})
   end
 
   defp apply_action(socket, :new_with_text, params) do
-    IO.inspect(params, label: :examplelive_new_with_text)
     socket
     |> assign_metadata()
-    |> assign(:page_title, "New Example")
+    |> assign(:back_to, params["back_to"])
+    |> assign(:page_title, "Examples")
     |> assign(:example, %Example{
         text: params["text"], 
         project: socket.assigns.cur_project_id})
   end
 
+  defp apply_action(socket, :index, %{"filter" => %{"label" => label}}) do
+    txt = if label == "_", do: "unlabeled", else: "labeled #{label}"
+    s2 = socket |> assign_metadata()
+    s2 |> assign(:page_title, "Examples (#{txt}, #{length(s2.assigns.results)})")
+  end
+
   defp apply_action(socket, :index, _params) do
-    IO.inspect(:index)
-    examples = fetch_examples()
-    labels = Util.pluck(examples, :label)
     socket
     |> assign_metadata()
-    |> assign(:page_title, "Listing Examples")
-    |> assign(:results, examples)
-    |> assign(:all_labels, labels)
-    |> assign(:example, nil)
-  end
-
-  defp apply_action(socket, :project, %{"project" => pid}) do
-    proj = Data.get_project!(pid)
-    ex2 = Data.list_examples_for_project(pid)
-    socket
-    |> assign(:results, ex2)
-    |> assign(:project, proj.id)
-    |> assign(:page_title, "#{proj.name} Examples")
-    |> assign_metadata()
-  end
-
-  defp apply_action(socket, :label, %{"label" => label}) do
-    examples = fetch_examples()
-    ex2 = examples |> Enum.filter fn x -> x.label == label end
-    socket
-    |> assign_metadata()
-    |> assign(:results, ex2)
-    |> assign(:page_title, "\"#{label}\" Examples")
+    |> assign(:page_title, "#{socket.assigns.cur_project.name} Examples")
   end
 
   defp apply_action(socket, :entity, %{"entity" => entity}) do
-    examples = fetch_examples()
-    ex2 = examples |> Enum.filter fn x -> x.entities != nil and entity in Map.values(x.entities) end
     socket
     |> assign_metadata()
-    |> assign(:results, ex2)
-    |> assign(:page_title, "\"#{entity}\" Examples")
+    |> assign(:page_title, "Examples (with entity \"#{entity}\")")
   end
 
   defp apply_action(socket, :delentity, _params) do
     socket
+    |> assign_metadata()
     |> assign(:page_title, "Listing Examples")
     |> assign(:example, nil)
   end
@@ -95,40 +84,57 @@ defmodule HTWeb.ExampleLive.Index do
   def handle_event("delete", %{"id" => id}, socket) do
     example = Data.get_example!(id)
     {:ok, _} = Data.delete_example(example)
-    {:noreply, assign(socket, :examples, fetch_examples())}
+    {:noreply, assign_metadata(socket) |> assign(:live_action, :index)}
   end
 
   @impl true
   def handle_event("suggest", %{"q" => query}, socket) do
 		IO.inspect(query, label: :handle_event_suggest)
-		results = search(query) 
-			|> Enum.filter(fn x -> x.text =~ query end)
-    {:noreply, assign(socket, results: results, query: query)}
+    if Util.len(query) > 2 do 
+      results = search(socket, query) 
+      {:noreply, assign(socket, results: results, query: query)}
+    else
+      {:noreply, socket}
+    end
   end
 
 	def handle_event("selected", %{"text" => text}, socket) do
 		IO.inspect({text,socket}, label: :selected)
 		example = HT.Data.get_example!(socket.assigns.example.id)
-		example2 = Map.update! example, :entities, fn x -> Map.put(x || %{}, text, "unlabeled") end
+		example2 = Map.update example, :entities, %{}, fn x -> Map.put(x || %{}, text, "unlabeled") end
 		# require IEx; IEx.pry
 		{:noreply, assign(socket, example: example2)}
 	end
 
   defp assign_metadata(socket) do
-    examples = fetch_examples()
-    labels = Util.pluck(examples, :label)
-    entities = Util.pluck(examples, :entities) |> Enum.flat_map &Map.values/1 
+    {{labels, entities}, results, n_examples} = fetch_filtered_examples(socket, socket.assigns.filter)
     socket 
+      |> assign(:results, results)
       |> assign(:all_labels, labels) 
       |> assign(:all_entities, entities) 
+      |> assign(:n_examples, n_examples)
       |> assign_new(:results, fn -> [] end) 
       |> assign_new(:example, fn -> nil end)
   end
 
-	defp search(query) do
-		Data.list_examples() 
+	defp search(socket, query) do
+    fetch_filtered_examples(socket, %{})
+      |> Enum.filter(fn x -> if x.text, do: x.text =~ query, else: false  end)
 	end
-  defp fetch_examples do
-    Data.list_examples()
+
+  defp filter_examples(socket, {"label", label}, examples) do
+    search = if label == "_", do: nil, else: label
+    examples |> Enum.filter(& &1.label==search)
+  end
+
+  defp filter_examples(socket, {"entity", entity}, examples) do
+    examples |> Enum.filter(fn x -> x.entities != nil and entity in Map.values(x.entities) end)
+  end
+
+  defp fetch_filtered_examples(socket, filter) do
+    examples = Data.list_examples_for_project(socket.assigns.cur_project_id)
+    stats = Util.label_stats_for_examples(examples)
+    out = Enum.reduce(filter, examples, fn fkv, exacc -> filter_examples(socket, fkv, exacc) end)
+    {stats, out, length(examples)}
   end
 end

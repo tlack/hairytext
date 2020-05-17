@@ -17,8 +17,8 @@ defmodule HT.Data.Example do
   def changeset(%HT.Data.Example{} = example, attrs) do
 		IO.inspect({example, attrs}, label: :example_changeset)
     example
-    |> cast(attrs, [:text, :label, :entities, :source, :status, :project])
-    |> validate_required([:text])
+    |> cast(attrs, [:text, :label, :entities, :source, :status, :image, :project])
+    |> validate_required([:project])
 		|> IO.inspect(label: :example_changeset_after)
   end
 end

@@ -26,6 +26,11 @@ defmodule HTWeb.Endpoint do
     gzip: false,
     only: ~w(css fonts images js favicon.ico robots.txt)
 
+  image_dir = Application.fetch_env!(:hairytext, HT.ImageNet)[:image_dir]
+  plug Plug.Static,
+    at: "/image_examples",
+    from: image_dir
+
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
   if code_reloading? do

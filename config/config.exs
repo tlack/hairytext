@@ -26,6 +26,9 @@ config :logger, :console,
 config :hairytext, HTWeb.Auth,
   users: %{ "admin" => "sohairy" }
 
+config :hairytext, HT.ImageNet, 
+  image_dir: "image_examples/"
+
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 

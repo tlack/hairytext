@@ -3,7 +3,7 @@ defmodule HTWeb.APIController do
 
   def predict(conn, %{"text" => text} = params) do
     IO.inspect(params, label: :APIController_predict)
-    result = Spacy.predict(text)
+    result = HT.Spacy.predict(text)
     pred = Util.from_spacy_prediction(result)
     HT.Data.create_prediction(pred)
     json(conn, pred)

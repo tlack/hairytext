@@ -16,7 +16,8 @@ defmodule HT.Application do
       # Start a worker by calling: HT.Worker.start_link(arg)
       # {HT.Worker, arg}
       {HT.Repo, "database/"},
-      {Spacy, {"python3", "priv/python"}}
+      {HT.Spacy, {"python3", "priv/python"}},
+      {HT.ImageNet, {"python3", "priv/python"}}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

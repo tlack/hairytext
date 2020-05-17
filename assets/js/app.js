@@ -26,15 +26,16 @@ let hooks = {
 			const hook = this
 			console.log('mounted', this.el)
 			const ta = this.el.querySelector('textarea')
-			ta.onselect = function() {
-				hook.callback(hook, ta)
-			}
+			if (ta) ta.onselect = function() { hook.callback(hook, ta) }
 		},
 		callback: function(hook, ta) {
 			console.log('callback', this)
-			const data = {text: ta.value.slice(ta.selectionStart, ta.selectionEnd)}
-			console.log('pushin', data)
-			hook.pushEvent('selected', data)
+			const ss = ta.selectionStart, se = ta.selectionEnd;
+			if (se - ss > 3) {
+				const data = {text: ta.value.slice(ta.selectionStart, ta.selectionEnd)}
+				console.log('pushin', data)
+				hook.pushEvent('selected', data)
+			}
 		}
 	}
 }

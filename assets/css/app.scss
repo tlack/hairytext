@@ -173,6 +173,13 @@ body {
 
 .button { margin-bottom: 0; }
 
+.button-bar {
+	display: flex;
+	justify-content: space-between;
+	div {
+	}
+}
+
 .container-content {
 	padding: 0 50px 50px 50px;
 }
@@ -191,6 +198,13 @@ body {
 
 .examples {
 	@extend %card-list;
+}
+
+figure {
+	text-align: center;
+	img {
+		max-height: 150px; 
+	}
 }
 
 header {
@@ -249,5 +263,6 @@ p.text { background: $neutral-bg; @extend %text-block; padding: 1em; }
 	}
 }
 .projects-list { @extend %card-list; }
+// select option { padding: $grid/2; line-height: $grid/2; }
 
 
