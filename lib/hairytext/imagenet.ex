@@ -27,9 +27,14 @@ defmodule HT.ImageNet do
   end
 
   def handle_cast({:train, examples, labels, clientpid, project_id}, pid) do
-    image_dir = Path.expand Application.fetch_env!(:hairytext, HT.ImageNet)[:image_dir] |> Path.join project_id
+    image_dir =
+      Path.expand(
+        Application.fetch_env!(:hairytext, HT.ImageNet)[:image_dir]
+        |> Path.join(project_id)
+      )
+
     IO.inspect({image_dir, labels, pid}, label: :ImageNet_train)
-    ex2 = examples |> Enum.filter(& &1.label != nil) |> Enum.map &{&1.image, &1.label}
+    ex2 = examples |> Enum.filter(&(&1.label != nil)) |> Enum.map(&{&1.image, &1.label})
     IO.inspect(ex2, label: :ImageNet_train_ex2)
     {:noreply, :python.call(pid, :hairyimage, :train, [clientpid, image_dir, ex2]), pid}
   end

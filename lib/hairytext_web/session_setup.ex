@@ -7,7 +7,8 @@ defmodule HTWeb.SessionSetup do
   def call(%{params: %{"set_proj" => proj_id}} = conn, _opts) do
     # IO.inspect(conn, label: :setproj)
     proj = HT.Data.get_project!(proj_id)
-    conn 
+
+    conn
     |> put_session(:cur_project_id, proj_id)
     |> put_session(:cur_project, proj)
   end
