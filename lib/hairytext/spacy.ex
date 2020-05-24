@@ -6,12 +6,12 @@ defmodule HT.Spacy do
     GenServer.start_link(__MODULE__, {python, path}, name: Spacy)
   end
 
-  def predict(text) do
-    GenServer.call(Spacy, {:predict, text})
+  def predict(project, text) do
+    GenServer.call(Spacy, {:predict, project, text})
   end
 
-  def train(examples, allowed_labels, clientpid, project_id) do
-    GenServer.cast(Spacy, {:train, examples, allowed_labels, clientpid, project_id})
+  def train(epochs, project, examples, allowed_labels, clientpid, project_id) do
+    GenServer.cast(Spacy, {:train, epochs, project, examples, allowed_labels, clientpid, project_id})
   end
 
   # Implementation:
@@ -21,9 +21,9 @@ defmodule HT.Spacy do
     :python.start([{:python, to_charlist(python)}, {:python_path, to_charlist(path)}])
   end
 
-  def handle_call({:predict, text}, from, pid) do
+  def handle_call({:predict, project, text}, from, pid) do
     IO.inspect({:predict, text, from, pid}, label: :predict)
-    {:reply, :python.call(pid, :hairytext, :predict, [text]), pid}
+    {:reply, :python.call(pid, :hairytext, :predict, [project.id, text]), pid}
   end
 
   defp make_cats(%Example{label: ""} = _row), do: ""
@@ -57,12 +57,12 @@ defmodule HT.Spacy do
     {text, {[], ''}}
   end
 
-  def handle_cast({:train, examples, allowed_labels, clientpid, project_id}, pid)
+  def handle_cast({:train, epochs, project, examples, allowed_labels, clientpid, project_id}, pid)
       when is_list(examples) and is_list(allowed_labels) do
     e2 =
       Enum.filter(examples, fn x -> Util.has(allowed_labels, x.label) end)
       |> Enum.map(&make_spacy_row/1)
 
-    {:noreply, :python.call(pid, :hairytext, :train, [clientpid, e2]), pid}
+    {:noreply, :python.call(pid, :hairytext, :train, [epochs, project.id, clientpid, e2]), pid}
   end
 end

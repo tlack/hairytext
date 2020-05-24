@@ -23,9 +23,9 @@ defmodule HTWeb.APIController do
       |> send_chunked(200)
 
     common = [
-        Zstream.entry("examples.json", [examples]),
-        Zstream.entry("predictions.json", [predictions])
+      Zstream.entry("examples.json", [examples]), Zstream.entry("predictions.json", [predictions])
     ]
+
     z = if proj.project_type == "image" do
       image_dir = Application.fetch_env!(:hairytext, HT.ImageNet)[:image_dir]
       abs_image_dir = Path.expand(image_dir)

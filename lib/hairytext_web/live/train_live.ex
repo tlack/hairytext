@@ -5,7 +5,7 @@ defmodule HTWeb.TrainLive do
 
   @impl true
   def mount(params, session, socket) do
-		IO.inspect({params, session}, label: TrainLive_mount)
+		# IO.inspect({params, session}, label: TrainLive_mount)
     ex2 = Data.list_examples_for_project(session["cur_project"].id)
     {labels, entities} = Util.label_stats_for_examples(ex2)
     s2=socket 
@@ -18,44 +18,29 @@ defmodule HTWeb.TrainLive do
 
   @impl true
   def handle_params(params, url, socket) do
-		IO.inspect({params, url}, label: ExampleLive_handle_params)
+		# IO.inspect({params, url}, label: ExampleLive_handle_params)
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
   def handle_info(msg, socket) do
-    IO.inspect(msg, label: :handle_info)
     data = elem(msg, 1)
     {:noreply, socket |> assign(:log, [Jason.decode!(data) | Util.take(socket.assigns.log, 25)])}
   end
 
   def handle_event("train", params, socket) do
+    IO.inspect(params, label: :train_event)
     cp = socket.assigns.cur_project
     examples = HT.Data.list_examples_for_project(cp.id)
       |> Enum.filter(&(&1.label != nil and Util.head(&1.label) != "_"))
     labels = Util.pluck(examples, :label)
-    IO.inspect(labels, label: :lbl)
+    epochs = 10
     out = if cp.project_type == "text" do
-      HT.Spacy.train(examples, labels, self(), cp.id)
+      HT.Spacy.train(epochs, cp, examples, labels, self(), cp.id)
     else
-      HT.ImageNet.train(examples, labels, self(), cp.id)
+      HT.ImageNet.train(epochs, cp, examples, labels, self(), cp.id)
     end
     IO.inspect(out, label: :train_go)
 		{:noreply, assign(socket, log: [])}
-  end
-
-  defp apply_action(socket, :go, params) do
-    cp = socket.assigns.cur_project
-    examples = HT.Data.list_examples_for_project(cp.id)
-      |> Enum.filter(&(&1.label != nil and Util.head(&1.label) != "_"))
-    labels = Util.pluck(examples, :label)
-    IO.inspect(labels, label: :lbl)
-    out = if cp.project_type == "text" do
-      HT.Spacy.train(examples, labels, self(), cp.id)
-    else
-      HT.ImageNet.train(examples, labels, self(), cp.id)
-    end
-    IO.inspect(out, label: :train_go)
-    socket |> assign(:log, [])
   end
 
   defp apply_action(socket, action, params) do
@@ -70,7 +55,14 @@ defmodule HTWeb.TrainLive do
     <h1>Training</h1>
 
     <p>
-      <a class="button" phx-click="train" phx-disable-with="Training..">Train</a>
+      <label for="epochs">Training epochs:</label>
+      <select name="epochs" id="epochs">
+        <option value="10">10</option>
+        <option value="100">100</option>
+        <option value="500">500</option>
+        <option value="1000">1000</option>
+      </select>
+      <a class="button" phx-click="train" phx-value-epochs="#epochs" phx-disable-with="Training..">Train</a>
     </p>
     
     <%= if @log != [] do %>

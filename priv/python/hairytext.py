@@ -7,7 +7,7 @@ import re
 import spacy
 import sys
 
-ITERS = 50
+ITERS = 10
 BASE_DIR = os.path.dirname(__file__)
 
 def make_tdata(s):
@@ -40,7 +40,13 @@ def make_tdata(s):
 def dec(txt):
     return txt.decode('UTF-8')
 
-def train(clientpid, train_data_raw):
+def train(epochs, project_id, clientpid, train_data_raw):
+    project_id = str(project_id)
+    model_dir = os.path.join(BASE_DIR, "spacy.model", project_id)
+    try:
+        os.makedirs(model_dir)
+    except:
+        pass
     train_data_raw = list(train_data_raw)
     train_data = []
     for item in train_data_raw:
@@ -75,7 +81,7 @@ def train(clientpid, train_data_raw):
             ner.add_label(str(ent[2]))
 
     optimizer = nlp.begin_training()
-    for i in range(ITERS):
+    for i in range(epochs):
         loss = {}
         random.shuffle(train_data)
         for text, annotations in train_data:
@@ -90,13 +96,13 @@ def train(clientpid, train_data_raw):
         loss['epoch'] = i
         print('loss',loss)
         erlport.erlang.cast(clientpid, ('loss', json.dumps(loss)))
-    nlp.to_disk(os.path.join(BASE_DIR, "trained.model"))
+    nlp.to_disk(model_dir)
     return json.dumps(loss)
 
-def predict(txt):
+def predict(project_id, txt):
     def b(txt):
         return bytes(txt, 'utf-8')
-    nlp2 = spacy.load(os.path.join(BASE_DIR, "trained.model"))
+    nlp2 = spacy.load(os.path.join(BASE_DIR, "trained.model", project_id))
     doc = nlp2(str(txt))
     print(doc.ents)
     print(dir(doc.ents))

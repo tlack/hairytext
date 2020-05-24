@@ -38,6 +38,6 @@ defmodule HTWeb.SessionSetup do
     Enum.reduce(Util.key(session), socket, fn k, acc ->
       Phoenix.LiveView.assign(acc, String.to_atom(k), session[k])
     end)
-    |> IO.inspect(label: :SessionSetupSocket)
+    # |> IO.inspect(label: :SessionSetupSocket)
   end
 end

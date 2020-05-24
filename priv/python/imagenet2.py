@@ -23,7 +23,8 @@ def ts_float32(val):
     """Used if *val* is an instance of numpy.float32."""
     return numpy.float64(val)
 
-def train(logging_cb, epochs):
+def train(logging_cb, project_id, epochs):
+    VER = 'v2';
     HEIGHT = 256
     WIDTH = 256
     BATCH_SIZE = 4
@@ -34,10 +35,10 @@ def train(logging_cb, epochs):
     BASE_DIR = os.path.dirname(__file__)
     TRAIN_DIR = os.path.join(BASE_DIR, "__hairyimage_cache__/train")
     TEST_DIR = os.path.join(BASE_DIR, "__hairyimage_cache__/test")
-    opts = f"{WIDTH},{HEIGHT},{BATCH_SIZE},{EPOCHS},{'.'.join([str(x) for x in FC_LAYERS])},{NUM_TRAIN}"
-    MODEL_FNAME = os.path.join(BASE_DIR, f"imagenet.model/v2-{opts}.h5")
-    PLOT_FNAME = os.path.join(BASE_DIR, f"imagenet.model/v2-{opts}-plot.png")
-    STATS_FNAME = os.path.join(BASE_DIR, f"imagenet.model/v2-{opts}-stats.json")
+    opts = f"{VER},{WIDTH},{HEIGHT},{BATCH_SIZE},{EPOCHS},{'.'.join([str(x) for x in FC_LAYERS])},{NUM_TRAIN}"
+    MODEL_FNAME = os.path.join(BASE_DIR, f"imagenet.model/{project_id}-{opts}.h5")
+    PLOT_FNAME = os.path.join(BASE_DIR, f"imagenet.model/{project_id}-{opts}-plot.png")
+    STATS_FNAME = os.path.join(BASE_DIR, f"imagenet.model/{project_id}-{opts}-stats.json")
 
     def _send(msg):
         print('send',msg)

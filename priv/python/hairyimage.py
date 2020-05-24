@@ -81,13 +81,13 @@ def generate_training_batch(batch_size, image_dir, train_data_raw):
     print('r', r)
     return r
 
-def train(clientpid, image_dir, train_data_raw): 
+def train(project_id, client_pid, image_dir, train_data_raw): 
     print('train_data_raw', image_dir, train_data_raw)
     generate_training_batch(2, dec(image_dir), train_data_raw)
     def log_cb(msg):
         print('log_cb',msg)
-        erlport.erlang.cast(clientpid, ('log', json.dumps(msg, default=to_serializable)))
-    imagenet2.train(log_cb, 25)
+        erlport.erlang.cast(client_pid, ('log', json.dumps(msg, default=to_serializable)))
+    imagenet2.train(log_cb, str(project_id), 25)
 
 def predict(txt):
     return {"text": txt, "classification": doc.cats, "entities": [[b(x.label_),b(x.text)] for x in doc.ents]}

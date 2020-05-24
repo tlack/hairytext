@@ -33,7 +33,7 @@ database (totally self contained), and runs fine on a $5/mo server without a GPU
 * Export a .ZIP of your labeled examples and prediction history (both convenient .JSON files)
 * REST JSON API for making predictions (to tie it into the rest of your project)
 * API predictions stored in log and reviewable in app
-* Label examples with a category
+* Label examples or images with a category/class
 * Label text inside examples as entities - for instance "time reference" or "place name"
 * Filter by entity tags or labels
 * Train online via web interface and report live training progress (rough..)
@@ -43,7 +43,7 @@ database (totally self contained), and runs fine on a $5/mo server without a GPU
 
 * Make into embeddable component like LiveDashboard
 * Support for "one at a time" editing that's more about a workflow of doing one labeling task after another
-* Image tagging (including objects inside images)
+* Object detection (aka classify regions inside images)
 * Assist in generating low-confidence predictions to more quickly improve model
 * Each project should have its own DETS files
 * APIs to: label examples new and old, bulk predict, view predictions log
@@ -173,5 +173,3 @@ Luckily HairyText provides a convenience function to do this.
 ```
 iex> Util.upsert_examples_from_image_folder()
 ```
-
-
