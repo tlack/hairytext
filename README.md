@@ -156,3 +156,22 @@ __meta__: #Ecto.Schema.Metadata<:built, "examples">,
 }
 ```
 
+There is a handy utility feature to use when you have a bulk of images to label.
+
+First, copy images from your examples directory into the HairyText
+`image_examples/` subdirectory for your project. Have your HairyText project ID
+at hand for this process (you can find it editing project settings).
+
+```
+$ find /tmp/my-new-examples/ -type f -name \*png | shuf | head -250 > example-list.txt
+$ cp `cat example-list.txt` ~/hairy-text-path/image_examples/16700ec8-dab3-4d53-bcee-9b5e2ea52d3d
+```
+
+Now we have them in the right path for HairyText to manipulate, but we need to get them into the database.
+Luckily HairyText provides a convenience function to do this.
+
+```
+iex> Util.upsert_examples_from_image_folder()
+```
+
+
