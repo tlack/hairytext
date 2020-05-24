@@ -1,4 +1,4 @@
-<h2><%= @title %></h2>
+<h2><%= @title %> #<%= @id %></h2>
 
 <%= f = form_for @changeset, "#",
   id: "project-form",
@@ -9,6 +9,10 @@
   <%= label f, :name %>
   <%= textarea f, :name %>
   <%= error_tag f, :name %>
+
+  <%= label f, :instructions %>
+  <%= textarea f, :instructions %>
+  <%= error_tag f, :instructions %>
 
   <%= label f, :labels %>
   <%= text_input f, :labels %>

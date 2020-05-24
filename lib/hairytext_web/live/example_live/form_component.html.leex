@@ -31,6 +31,11 @@
     <%= error_tag f, :text %>
   <% end %>
 
+  <%= if @project.instructions do %>
+    <%= label f, :instructions %>
+    <div class="instructions"><%= @project.instructions %></div>
+  <% end %>
+
   <%= if !@example.image do %>
     <%= label f, :entities %>
     <%= if @example.entities == nil or @example.entities == %{} do %>
