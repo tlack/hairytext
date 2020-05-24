@@ -58,6 +58,7 @@ defmodule Util do
   def map([]), do: %{}
   def map([{}]), do: %{}
 
+  def maps([]), do: []
   def maps(list) when is_list(list) and is_struct(hd(list)), do: Enum.map(list, &map/1)
 
   def map_to_keywords(map) when is_map(map) do
