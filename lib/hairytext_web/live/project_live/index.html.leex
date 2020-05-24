@@ -12,7 +12,7 @@
 <div class="projects-list">
   <%= for project <- @projects do %>
   <div>
-    <p><%= project.name %></p>
+    <p><%= project.name %> <i>(<%= project.project_type%>)</i></p>
     <div class="details">
       <%= live_redirect "Label", to: Routes.project_index_path(@socket, :set_default, project), class: "button" %></span>
       <%= live_redirect "Export", to: Routes.api_path(@socket, :export_project, project), class: "button" %></span>
