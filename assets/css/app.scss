@@ -184,6 +184,19 @@ body {
 	padding: 0 50px 50px 50px;
 }
 
+.ct-chart {
+	max-width: 400px;
+}
+.ct-label {
+	color: white;
+	font-size: 110% !important;
+	stroke: black;
+	stroke-size: 1px;
+}
+.ct-series-a .ct-slice-pie {
+	stroke: black;
+}
+
 #example-form {
 	textarea {
 		font-size: 1.5em;

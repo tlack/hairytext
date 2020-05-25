@@ -92,6 +92,22 @@ defmodule HTWeb.TrainLive do
       <% end %>
     <% end %>
 
+    <div class="ct-chart ct-perfect-fourth"></div>
+    <script>
+    var data = {
+      labels: <%= raw Jason.encode!(Map.keys(@all_labels) |> Enum.map(&String.slice(&1,0,4))) %>,
+      series: [ <%= raw Jason.encode!(Map.values(@all_labels)) %> ]
+    }
+    var sum = function(a,b) { return a+b; }
+    var opts = {
+    }
+    var pi = new Chartist.Bar('.ct-chart', data, opts);
+    setTimeout(function() { pi.update() }, 400)
+    </script>
+
+    <p>
+      Total examples: <b><%= @n_examples %></b>
+    </p>
     <p>
       Labels in use: 
       <%= for {label, count} <- @all_labels do %>
