@@ -12,8 +12,13 @@ defmodule HTWeb.APIController do
     IO.inspect(params, label: :API_example_image)
     proj = HT.Data.get_project!(project_id)
     img2 = Util.expand_image_str_to_fname(project_id, img)
-    {:ok, {id, example}} = HT.Data.create_example(%{"project" => proj.id, "image" => img2})
-    json(conn, Jason.encode!(example))
+    if img2 != nil do
+      label = params["label"] || nil
+      {:ok, {id, example}} = HT.Data.create_example(%{"project" => proj.id, "image" => img2, "label" => label})
+      json(conn, Jason.encode!(example))
+    else
+      conn |> put_status(:not_found) |> json(%{"not_found" => img})
+    end
   end
 
   def predict(conn, %{"project" => project_id, "text" => text} = params) do

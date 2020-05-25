@@ -49,18 +49,27 @@ def generate_training_batch(batch_size, image_dir, train_data_raw):
         class_ = dec(record[1])
         fname = dec(record[0])
         full_fname = os.path.join(image_dir, fname)
+
         if not os.path.exists(full_fname):
             err = ('error', 'noexist', full_fname) 
             print(err)
             # erlport.erlang.cast(clientpid, err)
             return err
+
+        try:
+            img = PIL.Image.open(full_fname)
+        except:
+            print("BAD IMAGE! ",fname)
+            continue
+
+        print(img.size)
+
         if class_ not in test_classes:
             test_classes.append(class_)
             tt = 'test'
             n_test += 1
         else:
             tt = 'train' if random.random() < TRAIN_TEST_MIX else 'test'
-            tt = 'train'
             if tt == 'train':
                 n_train += 1
         files.append((full_fname, class_, tt))

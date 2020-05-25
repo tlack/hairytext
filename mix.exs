@@ -49,7 +49,8 @@ defmodule HT.MixProject do
       {:erlport, "~> 0.9"},
       {:basic_auth, "~> 2.2.2"},
       {:zstream, "~> 0.5.1"},
-      {:httpoison, "~> 1.6"}
+      {:httpoison, "~> 1.6"},
+      {:fastimage, "~> 1.0.0-rc4"}
     ]
   end
 

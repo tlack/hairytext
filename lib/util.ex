@@ -122,18 +122,23 @@ defmodule Util do
 
   def expand_image_str_to_fname(project_id, str) do
     if Regex.match?(~r"^https?://", str) do
-      {:ok, response} = HTTPoison.get(str)
+      {:ok, response} = HTTPoison.get(str, [], hackney: [:insecure])
       headers = map(response.headers)
       ext = case headers["Content-Type"] do
         "image/jpeg" -> ".jpg"
         "image/png" -> ".png"
         _other -> ""
       end
-      fname = make_url_fname(str) <> ext
-      image_dir = image_dir_for_project(project_id)
-      full_fname = Path.join(image_dir, fname)
-      File.write!(full_fname, response.body)
-      fname
+      
+      if ext != "" do
+        fname = make_url_fname(str) <> ext
+        image_dir = image_dir_for_project(project_id)
+        full_fname = Path.join(image_dir, fname)
+        File.write!(full_fname, response.body)
+        fname
+      else
+        nil
+      end
     else
       if String.length(str) > 128 do
         fname = ugly_datetime() <> ".jpg"
@@ -148,7 +153,6 @@ defmodule Util do
   end
 
   def from_spacy_prediction(%HT.Data.Prediction{} = pred), do: pred
-
   def from_spacy_prediction(result) do
     cls = result['classification']
     classification = Util.argmax(cls)
@@ -199,7 +203,5 @@ defmodule Util do
     IO.inspect(fnames)
     IO.inspect(examples_by_proj)
   end
-
-
 end
 
