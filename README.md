@@ -109,7 +109,7 @@ Then open http://localhost:4141 to start playing. The default username and passw
 # API
 
 ```
-$ curl 'http://localhost:4141/api/predict?text=i+am+live+on+twitch' | json_pp
+$ curl 'http://localhost:4141/api/predict/9d00fa70-df5c-4a3a-9f0d-8c53f3345417?text=i+am+live+on+twitch' | json_pp
 {
 	"text" : "i am live on twitch",
 		"label" : "good",
@@ -118,6 +118,17 @@ $ curl 'http://localhost:4141/api/predict?text=i+am+live+on+twitch' | json_pp
 			"service" : "twitch"
 		}
 }
+```
+
+Add a new example to an image classification project:
+```
+$ curl -X POST -F "image=@test.jpg" "http://localhost:4141/api/example/16700ec8-dab3-4d53-bcee-9b5e2ea52d3d"
+```
+
+Add a new image, from a URL, as an example to an image classification project:
+```
+$ curl -X POST -F "image=http://example.com/images/1.jpg" \
+		"http://localhost:4141/api/example/16700ec8-dab3-4d53-bcee-9b5e2ea52d3d" 
 ```
 
 # Use from iex shell

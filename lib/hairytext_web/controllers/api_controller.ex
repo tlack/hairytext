@@ -1,12 +1,30 @@
 defmodule HTWeb.APIController do
   use HTWeb, :controller
 
-  def predict(conn, %{"text" => text} = params) do
+  def add_example(conn, %{"project" => project_id, "text" => txt} = params) do
+    IO.inspect(params, label: :API_example_text)
+    proj = HT.Data.get_project!(project_id)
+    {:ok, {id, example}} = HT.Data.create_example(%{"project" => proj.id, "text" => txt})
+    json(conn, Jason.encode!(example))
+  end
+
+  def add_example(conn, %{"project" => project_id, "image" => img} = params) do
+    IO.inspect(params, label: :API_example_image)
+    proj = HT.Data.get_project!(project_id)
+    img2 = Util.expand_image_str_to_fname(project_id, img)
+    {:ok, {id, example}} = HT.Data.create_example(%{"project" => proj.id, "image" => img2})
+    json(conn, Jason.encode!(example))
+  end
+
+  def predict(conn, %{"project" => project_id, "text" => text} = params) do
     IO.inspect(params, label: :APIController_predict)
-    result = HT.Spacy.predict(text)
+    proj = HT.Data.get_project!(project_id)
+    result = HT.Spacy.predict(proj, text)
     pred = Util.from_spacy_prediction(result)
-    HT.Data.create_prediction(pred)
-    json(conn, pred)
+    pred2 = Util.map(pred)
+    IO.inspect(pred, label: :api_got_prediction)
+    HT.Data.create_prediction(pred2)
+    json(conn, pred2)
   end
 
   def export_project(conn, %{"id" => project_id} = _params) do

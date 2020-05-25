@@ -43,8 +43,9 @@ defmodule HTWeb.Router do
 
   scope "/api", HTWeb do
     pipe_through :api
+    post "/example/:project", APIController, :add_example
     get "/export/:id", APIController, :export_project
-    get "/predict", APIController, :predict
+    get "/predict/:project", APIController, :predict
   end
 
   # Enables LiveDashboard only for development

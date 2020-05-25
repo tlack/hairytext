@@ -104,6 +104,49 @@ defmodule Util do
     "/image_examples/#{example.project}/#{example.image}"
   end
 
+  def image_dir_for_project(project_id) do
+    image_dir =
+      Path.expand(
+        Application.fetch_env!(:hairytext, HT.ImageNet)[:image_dir]
+        |> Path.join(project_id)
+      )
+  end
+
+  def expand_image_str_to_fname(project_id, %Plug.Upload{} = upload) do
+    fname = ugly_datetime() <> upload.filename
+    image_dir = image_dir_for_project(project_id)
+    full_fname = Path.join(image_dir, fname)
+    File.write!(full_fname, File.read!(upload.path))
+    fname
+  end
+
+  def expand_image_str_to_fname(project_id, str) do
+    if Regex.match?(~r"^https?://", str) do
+      {:ok, response} = HTTPoison.get(str)
+      headers = map(response.headers)
+      ext = case headers["Content-Type"] do
+        "image/jpeg" -> ".jpg"
+        "image/png" -> ".png"
+        _other -> ""
+      end
+      fname = make_url_fname(str) <> ext
+      image_dir = image_dir_for_project(project_id)
+      full_fname = Path.join(image_dir, fname)
+      File.write!(full_fname, response.body)
+      fname
+    else
+      if String.length(str) > 128 do
+        fname = ugly_datetime() <> ".jpg"
+        image_dir = image_dir_for_project(project_id)
+        full_fname = Path.join(image_dir, fname)
+        File.write!(full_fname, str)
+        fname
+      else
+        str
+      end
+    end
+  end
+
   def from_spacy_prediction(%HT.Data.Prediction{} = pred), do: pred
 
   def from_spacy_prediction(result) do
@@ -118,6 +161,10 @@ defmodule Util do
     labels = pluck(ex, :label) |> Enum.frequencies
     ents = pluck(ex, :entities) |> Enum.filter(& &1 == %{}) |> Enum.frequencies
     {labels, ents}
+  end
+
+  def make_url_fname(url) do
+    Regex.replace(~r/[^a-z0-9]/iu, url, "")
   end
 
   def project_labels_and_entities(cp) do

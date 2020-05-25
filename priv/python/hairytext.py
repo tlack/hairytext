@@ -100,6 +100,7 @@ def train(epochs, project_id, clientpid, train_data_raw):
     return json.dumps(loss)
 
 def predict(project_id, txt):
+    project_id = str(project_id)
     def b(txt):
         return bytes(txt, 'utf-8')
     nlp2 = spacy.load(os.path.join(BASE_DIR, "trained.model", project_id))

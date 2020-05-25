@@ -48,7 +48,8 @@ defmodule HT.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:erlport, "~> 0.9"},
       {:basic_auth, "~> 2.2.2"},
-      {:zstream, "~> 0.5.1"}
+      {:zstream, "~> 0.5.1"},
+      {:httpoison, "~> 1.6"}
     ]
   end
 
