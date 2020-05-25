@@ -100,9 +100,7 @@ defmodule Util do
     end
   end
 
-  def example_image_url(example) do
-    "/image_examples/#{example.project}/#{example.image}"
-  end
+  def example_image_url(example), do: "/image_examples/#{example.project}/#{example.image}"
 
   def image_dir_for_project(project_id) do
     image_dir =

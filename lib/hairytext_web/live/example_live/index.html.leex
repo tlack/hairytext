@@ -8,6 +8,7 @@
     example: @example,
     project: @cur_project_id,
     text: "",
+    filter: @filter,
     return_to: Routes.example_index_path(@socket, :index, [filter: @filter]) %>
 <% end %>
 
@@ -19,6 +20,7 @@
     example: @example,
     project: @cur_project_id,
     text: "",
+    filter: @filter,
     return_to: Routes.example_index_path(@socket, :index, [filter: @filter]) %>
 <% end %>
 
@@ -29,6 +31,7 @@
     action: @live_action,
     example: @example,
     project: @cur_project_id,
+    filter: @filter,
     return_to: Routes.example_index_path(@socket, :index, [filter: @filter]) %>
 <% end %>
 

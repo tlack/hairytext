@@ -4,12 +4,13 @@ defmodule HTWeb.TrainLive do
   alias HT.Data.Example
 
   @impl true
-  def mount(params, session, socket) do
+  def mount(_params, session, socket) do
 		# IO.inspect({params, session}, label: TrainLive_mount)
     ex2 = Data.list_examples_for_project(session["cur_project"].id)
     {labels, entities} = Util.label_stats_for_examples(ex2)
     s2=socket 
       |> HTWeb.SessionSetup.assigns(session) 
+      |> assign(:n_examples, length(ex2))
       |> assign(:all_labels, labels)
       |> assign(:all_entities, entities)
       |> assign(:log, [])
@@ -22,6 +23,7 @@ defmodule HTWeb.TrainLive do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
+  @impl true
   def handle_info(msg, socket) do
     data = elem(msg, 1)
     {:noreply, socket |> assign(:log, [Jason.decode!(data) | Util.take(socket.assigns.log, 25)])}
@@ -48,6 +50,7 @@ defmodule HTWeb.TrainLive do
     socket
   end
 
+  @impl true
   def render(assigns) do
     # XXX pass in # of epochs from UI or model config tool! THIS IS MADNESS!
     ~L"""

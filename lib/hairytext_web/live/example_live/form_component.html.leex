@@ -71,7 +71,7 @@
   <div class="button-bar">
     <span><%= submit "Save", phx_disable_with: "Saving..." %> &nbsp;&nbsp; in <i><%= @project.name %></i></span>
     <%= if @example.id do %>
-      <span><%= live_patch "Del", to: Routes.example_index_path(@socket, :delete, @example), class: "button"%></span>
+      <span><%= live_patch "Del", to: Routes.example_index_path(@socket, :delete, @example, [filter: @filter]), class: "button"%></span>
     <% end %>
   </div>
 </form>

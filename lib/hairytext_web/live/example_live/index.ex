@@ -26,8 +26,7 @@ defmodule HTWeb.ExampleLive.Index do
       _other -> :ok = Data.delete_example(example)
     end
     socket
-    |> assign_metadata()
-    |> assign(:page_title, "Examples")
+    |> push_redirect(to: Routes.example_index_path(socket, :index, [filter: socket.assigns.filter]))
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
@@ -40,7 +39,6 @@ defmodule HTWeb.ExampleLive.Index do
   defp apply_action(socket, :new, params) do
     socket
     |> assign_metadata()
-    |> assign(:back_to, params["back_to"])
     |> assign(:page_title, "Examples")
     |> assign(:example, %Example{project: socket.assigns.cur_project_id})
   end
