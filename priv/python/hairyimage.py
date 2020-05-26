@@ -4,13 +4,14 @@ import json
 import os
 import numpy
 import pickle
+import PIL
 import random
 import re
 import sys
 
 import imagenet2
 
-TRAIN_TEST_MIX = 0.8
+TRAIN_TEST_MIX = 0.9
 
 BASE_DIR = os.path.dirname(__file__)
 CACHE_DIR = os.path.join(os.path.dirname(__file__), "__hairyimage_cache__")

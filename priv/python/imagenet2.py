@@ -24,12 +24,14 @@ def ts_float32(val):
     return numpy.float64(val)
 
 def train(logging_cb, project_id, epochs):
+    project_id = str(project_id)
+
     VER = 'v2';
-    HEIGHT = 256
-    WIDTH = 256
-    BATCH_SIZE = 4
+    HEIGHT = 96
+    WIDTH = 96
+    BATCH_SIZE = 32
     EPOCHS = epochs
-    FC_LAYERS = [WIDTH // 2, HEIGHT // 2]
+    FC_LAYERS = [WIDTH * 4]
     NUM_TRAIN = 500
 
     BASE_DIR = os.path.dirname(__file__)
