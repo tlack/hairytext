@@ -122,12 +122,20 @@ $ curl 'http://localhost:4141/api/predict/9d00fa70-df5c-4a3a-9f0d-8c53f3345417?t
 
 Add a new example to an image classification project:
 ```
+$ curl https://example.com/test/someimage.jpg -o test.jpg
 $ curl -X POST -F "image=@test.jpg" "http://localhost:4141/api/example/16700ec8-dab3-4d53-bcee-9b5e2ea52d3d"
 ```
 
-Add a new image, from a URL, as an example to an image classification project:
+Add a new example image to a project using its URL:
 ```
 $ curl -X POST -F "image=http://example.com/images/1.jpg" \
+		"http://localhost:4141/api/example/16700ec8-dab3-4d53-bcee-9b5e2ea52d3d" 
+```
+
+Add a new example, with a known label, to a project:
+```
+$ curl -X POST -F "image=http://example.com/images/1.jpg" \
+		-F "label=yellow" \
 		"http://localhost:4141/api/example/16700ec8-dab3-4d53-bcee-9b5e2ea52d3d" 
 ```
 
